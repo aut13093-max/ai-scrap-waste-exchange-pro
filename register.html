@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đăng ký - AI SCRAP PRO</title>
+<style>
+body{font-family:Arial;background:#f1f5f3;margin:0;padding:20px;color:#183b30}
+main{max-width:480px;margin:25px auto;background:white;padding:22px;border-radius:14px}
+h2{text-align:center}
+p{text-align:center;color:#64756e}
+label{display:block;margin-top:15px;font-weight:bold}
+input,select{width:100%;padding:13px;margin-top:7px;box-sizing:border-box;border:1px solid #ccd8d1;border-radius:8px;font-size:16px}
+button{width:100%;padding:14px;margin-top:20px;background:#176b4d;color:white;border:0;border-radius:8px;font-size:16px}
+a{color:#176b4d}
+</style>
+</head>
+<body>
+<main>
+<h2>Đăng ký tài khoản</h2>
+<p>AI SCRAP & WASTE EXCHANGE PRO</p>
+
+<form onsubmit="register(event)">
+<label>Loại tài khoản / 账户类型</label>
+<select id="role" required>
+<option value="seller">Người bán - 卖家</option>
+<option value="buyer">Người mua - 买家</option>
+</select>
+
+<label>Họ và tên / 姓名</label>
+<input id="name" required placeholder="Nhập họ và tên">
+
+<label>Tên công ty / 公司名称</label>
+<input id="company" placeholder="Tên công ty (nếu có)">
+
+<label>Số điện thoại / 电话</label>
+<input id="phone" type="tel" required placeholder="Số điện thoại">
+
+<label>Tỉnh thành / 省份</label>
+<input id="province" required placeholder="Ví dụ: TP. Hồ Chí Minh">
+
+<label>Email</label>
+<input id="email" type="email" placeholder="Email">
+
+<button type="submit">Đăng ký / 注册</button>
+</form>
+<p><a href="index.html">Quay lại trang chủ / 返回首页</a></p>
+</main>
+
+<script>
+function register(e){
+ e.preventDefault();
+ const data={
+  role:document.getElementById('role').value,
+  name:document.getElementById('name').value,
+  company:document.getElementById('company').value,
+  phone:document.getElementById('phone').value,
+  province:document.getElementById('province').value,
+  email:document.getElementById('email').value
+ };
+ localStorage.setItem('scrap_registration_demo',JSON.stringify(data));
+ alert('Đã nhận thông tin đăng ký thử nghiệm. Chức năng lưu tài khoản chính thức sẽ được kết nối ở bước tiếp theo.');
+}
+</script>
+</body>
+</html>

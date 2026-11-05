@@ -3,65 +3,120 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Đăng ký - AI SCRAP PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI SCRAP - Register</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{font-family:Arial;background:#f1f5f3;margin:0;padding:20px;color:#183b30}
-main{max-width:480px;margin:25px auto;background:white;padding:22px;border-radius:14px}
-h2{text-align:center}
-p{text-align:center;color:#64756e}
-label{display:block;margin-top:15px;font-weight:bold}
-input,select{width:100%;padding:13px;margin-top:7px;box-sizing:border-box;border:1px solid #ccd8d1;border-radius:8px;font-size:16px}
-button{width:100%;padding:14px;margin-top:20px;background:#176b4d;color:white;border:0;border-radius:8px;font-size:16px}
-a{color:#176b4d}
+*{box-sizing:border-box}
+body{margin:0;padding:20px;background:#f1f5f9;font-family:Arial,sans-serif;color:#172033}
+.box{max-width:480px;margin:25px auto;background:white;padding:24px;border-radius:16px;box-shadow:0 5px 25px #0001}
+h2{text-align:center;color:#087e65}
+p{text-align:center;color:#64748b}
+label{display:block;margin-top:14px;font-weight:bold}
+input,select{width:100%;padding:13px;margin-top:6px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px}
+button{width:100%;padding:14px;margin-top:20px;border:0;border-radius:8px;background:#087e65;color:white;font-size:16px;font-weight:bold}
+.home{display:block;text-align:center;margin-top:18px;color:#087e65}
+#message{margin-top:15px;line-height:1.6;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
-<main>
-<h2>Đăng ký tài khoản</h2>
-<p>AI SCRAP & WASTE EXCHANGE PRO</p>
+<div class="box">
+<h2>AI SCRAP & WASTE EXCHANGE PRO</h2>
+<p>Đăng ký tài khoản - 创建账户</p>
 
-<form onsubmit="register(event)">
-<label>Loại tài khoản / 账户类型</label>
+<form id="registerForm">
+<label>Loại tài khoản - 账户类型</label>
 <select id="role" required>
 <option value="seller">Người bán - 卖家</option>
 <option value="buyer">Người mua - 买家</option>
+<option value="both">Người mua và người bán - 买家及卖家</option>
 </select>
 
-<label>Họ và tên / 姓名</label>
-<input id="name" required placeholder="Nhập họ và tên">
+<label>Họ và tên - 姓名</label>
+<input id="full_name" required maxlength="100" placeholder="Nhập họ tên">
 
-<label>Tên công ty / 公司名称</label>
-<input id="company" placeholder="Tên công ty (nếu có)">
+<label>Tên công ty - 公司名称</label>
+<input id="company_name" maxlength="150" placeholder="Tên công ty (nếu có)">
 
-<label>Số điện thoại / 电话</label>
-<input id="phone" type="tel" required placeholder="Số điện thoại">
+<label>Số điện thoại - 电话</label>
+<input id="phone" required maxlength="30" placeholder="Số điện thoại">
 
-<label>Tỉnh thành / 省份</label>
-<input id="province" required placeholder="Ví dụ: TP. Hồ Chí Minh">
+<label>Tỉnh / Thành phố - 省市</label>
+<input id="province" required maxlength="100" placeholder="Ví dụ: Ho Chi Minh">
 
 <label>Email</label>
-<input id="email" type="email" placeholder="Email">
+<input id="email" type="email" required placeholder="Email">
 
-<button type="submit">Đăng ký / 注册</button>
+<label>Mật khẩu - 密码（至少8位）</label>
+<input id="password" type="password" required minlength="8" placeholder="Ít nhất 8 ký tự">
+
+<button id="submitBtn" type="submit">ĐĂNG KÝ / 注册</button>
 </form>
-<p><a href="index.html">Quay lại trang chủ / 返回首页</a></p>
-</main>
+
+<div id="message" role="status"></div>
+<a class="home" href="index.html">← Trang chủ / 返回首页</a>
+</div>
 
 <script>
-function register(e){
- e.preventDefault();
- const data={
-  role:document.getElementById('role').value,
-  name:document.getElementById('name').value,
-  company:document.getElementById('company').value,
-  phone:document.getElementById('phone').value,
-  province:document.getElementById('province').value,
-  email:document.getElementById('email').value
- };
- localStorage.setItem('scrap_registration_demo',JSON.stringify(data));
- alert('Đã nhận thông tin đăng ký thử nghiệm. Chức năng lưu tài khoản chính thức sẽ được kết nối ở bước tiếp theo.');
+const SUPABASE_URL = "https://uddrsqankxnepjzgdatx.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_MpGMJBtACKRil4Aa8eQttw_fGyHRn5A";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const params = new URLSearchParams(window.location.search);
+const requestedRole = params.get("role");
+if (["seller","buyer","both"].includes(requestedRole)) {
+  document.getElementById("role").value = requestedRole;
 }
+
+const form = document.getElementById("registerForm");
+const message = document.getElementById("message");
+const button = document.getElementById("submitBtn");
+
+form.addEventListener("submit", async function(e) {
+  e.preventDefault();
+  message.textContent = "";
+  button.disabled = true;
+  button.textContent = "Đang xử lý...";
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const metadata = {
+    role: document.getElementById("role").value,
+    full_name: document.getElementById("full_name").value.trim(),
+    company_name: document.getElementById("company_name").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    province: document.getElementById("province").value.trim()
+  };
+
+  try {
+    const { data, error } = await db.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata,
+        emailRedirectTo: window.location.origin + "/register.html"
+      }
+    });
+
+    if (error) throw error;
+
+    if (data.session) {
+      message.style.color = "green";
+      message.textContent = "Đăng ký thành công! Bạn đã có thể đăng nhập.";
+    } else {
+      message.style.color = "green";
+      message.textContent = "Đăng ký đã được tiếp nhận. Vui lòng kiểm tra email và xác nhận tài khoản trước khi đăng nhập.";
+    }
+
+    form.reset();
+  } catch (error) {
+    message.style.color = "red";
+    message.textContent = "Lỗi đăng ký: " + error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = "ĐĂNG KÝ / 注册";
+  }
+});
 </script>
 </body>
 </html>

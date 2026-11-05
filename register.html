@@ -5,27 +5,114 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI SCRAP - Register</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;padding:20px;background:#f1f5f9;font-family:Arial,sans-serif;color:#172033}
-.box{max-width:480px;margin:25px auto;background:white;padding:24px;border-radius:16px;box-shadow:0 5px 25px #0001}
-h2{text-align:center;color:#087e65}
-p{text-align:center;color:#64748b}
-label{display:block;margin-top:14px;font-weight:bold}
-input,select{width:100%;padding:13px;margin-top:6px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px}
-button{width:100%;padding:14px;margin-top:20px;border:0;border-radius:8px;background:#087e65;color:white;font-size:16px;font-weight:bold}
-.home{display:block;text-align:center;margin-top:18px;color:#087e65}
-#message{margin-top:15px;line-height:1.6;overflow-wrap:anywhere}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 18px;
+  background: #f1f5f9;
+  font-family: Arial, sans-serif;
+  color: #172033;
+}
+
+.box {
+  max-width: 480px;
+  margin: 20px auto;
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 5px 25px #0001;
+}
+
+h2 {
+  text-align: center;
+  color: #087e65;
+  font-size: 22px;
+}
+
+p {
+  text-align: center;
+  color: #64748b;
+}
+
+.status {
+  padding: 12px;
+  margin: 15px 0;
+  border-radius: 8px;
+  background: #f1f5f9;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+label {
+  display: block;
+  margin-top: 14px;
+  font-weight: bold;
+}
+
+input, select {
+  width: 100%;
+  padding: 13px;
+  margin-top: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  border: 0;
+  border-radius: 8px;
+  background: #087e65;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+button:disabled {
+  background: #94a3b8;
+}
+
+.home {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #087e65;
+  text-decoration: none;
+}
+
+#message {
+  margin-top: 16px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
 </style>
 </head>
+
 <body>
+
 <div class="box">
+
 <h2>AI SCRAP & WASTE EXCHANGE PRO</h2>
+
 <p>Đăng ký tài khoản - 创建账户</p>
 
+<div id="connectionStatus" class="status">
+正在检查 Supabase 连接...
+</div>
+
 <form id="registerForm">
+
 <label>Loại tài khoản - 账户类型</label>
+
 <select id="role" required>
 <option value="seller">Người bán - 卖家</option>
 <option value="buyer">Người mua - 买家</option>
@@ -33,90 +120,252 @@ button{width:100%;padding:14px;margin-top:20px;border:0;border-radius:8px;backgr
 </select>
 
 <label>Họ và tên - 姓名</label>
-<input id="full_name" required maxlength="100" placeholder="Nhập họ tên">
+<input
+  id="full_name"
+  required
+  maxlength="100"
+  placeholder="Nhập họ tên"
+>
 
 <label>Tên công ty - 公司名称</label>
-<input id="company_name" maxlength="150" placeholder="Tên công ty (nếu có)">
+<input
+  id="company_name"
+  maxlength="150"
+  placeholder="Tên công ty (nếu có)"
+>
 
 <label>Số điện thoại - 电话</label>
-<input id="phone" required maxlength="30" placeholder="Số điện thoại">
+<input
+  id="phone"
+  type="tel"
+  required
+  maxlength="30"
+  placeholder="Số điện thoại"
+>
 
 <label>Tỉnh / Thành phố - 省市</label>
-<input id="province" required maxlength="100" placeholder="Ví dụ: Ho Chi Minh">
+<input
+  id="province"
+  required
+  maxlength="100"
+  placeholder="Ví dụ: Ho Chi Minh"
+>
 
 <label>Email</label>
-<input id="email" type="email" required placeholder="Email">
+<input
+  id="email"
+  type="email"
+  required
+  autocomplete="email"
+  placeholder="Email"
+>
 
 <label>Mật khẩu - 密码（至少8位）</label>
-<input id="password" type="password" required minlength="8" placeholder="Ít nhất 8 ký tự">
+<input
+  id="password"
+  type="password"
+  required
+  minlength="8"
+  autocomplete="new-password"
+  placeholder="Ít nhất 8 ký tự"
+>
 
-<button id="submitBtn" type="submit">ĐĂNG KÝ / 注册</button>
+<button id="submitBtn" type="submit">
+ĐĂNG KÝ / 注册
+</button>
+
 </form>
 
 <div id="message" role="status"></div>
-<a class="home" href="index.html">← Trang chủ / 返回首页</a>
+
+<a class="home" href="index.html">
+← Trang chủ / 返回首页
+</a>
+
 </div>
 
 <script>
-const SUPABASE_URL = "https://uddrsqankxnepjzgdatx.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_MpGMJBtACKRil4Aa8eQttw_fGyHRn5A";
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_URL =
+  "https://uddrsqankxnepjzgdatx.supabase.co";
 
-const params = new URLSearchParams(window.location.search);
-const requestedRole = params.get("role");
-if (["seller","buyer","both"].includes(requestedRole)) {
-  document.getElementById("role").value = requestedRole;
+const SUPABASE_ANON_KEY =
+  "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A";
+
+const statusBox =
+  document.getElementById("connectionStatus");
+
+const message =
+  document.getElementById("message");
+
+const form =
+  document.getElementById("registerForm");
+
+const button =
+  document.getElementById("submitBtn");
+
+let db = null;
+
+function showMessage(text, color) {
+  message.textContent = text;
+  message.style.color = color;
 }
 
-const form = document.getElementById("registerForm");
-const message = document.getElementById("message");
-const button = document.getElementById("submitBtn");
+async function checkConnection() {
 
-form.addEventListener("submit", async function(e) {
-  e.preventDefault();
-  message.textContent = "";
+  try {
+
+    if (!window.supabase) {
+      throw new Error(
+        "Supabase library failed to load. Please check internet connection."
+      );
+    }
+
+    db = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    const response = await fetch(
+      SUPABASE_URL + "/auth/v1/settings",
+      {
+        method: "GET",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "HTTP " + response.status +
+        ". Please check Project URL and Publishable Key."
+      );
+    }
+
+    statusBox.textContent =
+      "✓ Supabase API 已响应，可以进行注册。";
+
+    statusBox.style.color = "green";
+
+  } catch (error) {
+
+    statusBox.textContent =
+      "连接检查失败：" + error.message;
+
+    statusBox.style.color = "red";
+
+    console.error(error);
+  }
+}
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const requestedRole =
+  params.get("role");
+
+if (["seller", "buyer", "both"].includes(requestedRole)) {
+  document.getElementById("role").value =
+    requestedRole;
+}
+
+form.addEventListener("submit", async function(event) {
+
+  event.preventDefault();
+
+  showMessage("", "black");
+
+  if (!db) {
+    showMessage(
+      "Supabase 尚未连接，请检查 API Key 和网络。",
+      "red"
+    );
+    return;
+  }
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  const metadata = {
+    role: document.getElementById("role").value,
+
+    full_name:
+      document.getElementById("full_name").value.trim(),
+
+    company_name:
+      document.getElementById("company_name").value.trim(),
+
+    phone:
+      document.getElementById("phone").value.trim(),
+
+    province:
+      document.getElementById("province").value.trim()
+  };
+
   button.disabled = true;
   button.textContent = "Đang xử lý...";
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  const metadata = {
-    role: document.getElementById("role").value,
-    full_name: document.getElementById("full_name").value.trim(),
-    company_name: document.getElementById("company_name").value.trim(),
-    phone: document.getElementById("phone").value.trim(),
-    province: document.getElementById("province").value.trim()
-  };
-
   try {
-    const { data, error } = await db.auth.signUp({
-      email,
-      password,
-      options: {
-        data: metadata,
-        emailRedirectTo: window.location.origin + "/register.html"
-      }
-    });
 
-    if (error) throw error;
+    const { data, error } =
+      await db.auth.signUp({
 
-    if (data.session) {
-      message.style.color = "green";
-      message.textContent = "Đăng ký thành công! Bạn đã có thể đăng nhập.";
-    } else {
-      message.style.color = "green";
-      message.textContent = "Đăng ký đã được tiếp nhận. Vui lòng kiểm tra email và xác nhận tài khoản trước khi đăng nhập.";
+        email: email,
+
+        password: password,
+
+        options: {
+          data: metadata,
+
+          emailRedirectTo:
+            window.location.origin + "/register.html"
+        }
+
+      });
+
+    if (error) {
+      throw error;
     }
 
-    form.reset();
+    if (data.session) {
+
+      showMessage(
+        "注册成功！账户已经建立，可以继续使用平台。",
+        "green"
+      );
+
+    } else {
+
+      showMessage(
+        "注册申请已提交！请检查邮箱并点击验证链接。验证完成后即可继续使用。",
+        "green"
+      );
+
+    }
+
   } catch (error) {
-    message.style.color = "red";
-    message.textContent = "Lỗi đăng ký: " + error.message;
+
+    console.error(error);
+
+    showMessage(
+      "注册失败：" + error.message,
+      "red"
+    );
+
   } finally {
+
     button.disabled = false;
     button.textContent = "ĐĂNG KÝ / 注册";
+
   }
+
 });
+
+checkConnection();
 </script>
+
 </body>
 </html>

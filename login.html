@@ -19,7 +19,6 @@ button:disabled{background:#94a3b8}
 #message{margin-top:16px;line-height:1.5;overflow-wrap:anywhere}
 .links{text-align:center;margin-top:20px;line-height:2}
 a{color:#176b43}
-.hint{font-size:13px;color:#64748b;margin-top:6px}
 </style>
 </head>
 <body>
@@ -28,10 +27,9 @@ a{color:#176b43}
 <h3>Đăng nhập tài khoản / 账户登录</h3>
 
 <form id="loginForm">
-<label>Số điện thoại - 手机号</label>
-<input id="phone" type="tel" required maxlength="20"
-placeholder="0984876505" autocomplete="tel">
-<div class="hint">Ví dụ: 0984876505 hoặc +84984876505</div>
+<label>Email - 邮箱</label>
+<input id="email" type="email" required maxlength="254"
+placeholder="example@gmail.com" autocomplete="email">
 
 <label>Mật khẩu - 密码</label>
 <input id="password" type="password" required
@@ -62,28 +60,6 @@ const form = document.getElementById("loginForm");
 const message = document.getElementById("message");
 const button = document.getElementById("loginBtn");
 
-function normalizeVietnamPhone(value) {
-  let phone = value.trim().replace(/[\s().-]/g, "");
-
-  if (phone.startsWith("+84")) {
-    // Already international format
-  } else if (phone.startsWith("0084")) {
-    phone = "+" + phone.slice(2);
-  } else if (phone.startsWith("84")) {
-    phone = "+" + phone;
-  } else if (phone.startsWith("0")) {
-    phone = "+84" + phone.slice(1);
-  } else {
-    throw new Error("请填写越南手机号，例如 0984876505。");
-  }
-
-  if (!/^\+84[0-9]{9,10}$/.test(phone)) {
-    throw new Error("手机号格式不正确，请检查后重试。");
-  }
-
-  return phone;
-}
-
 form.addEventListener("submit", async function(event) {
   event.preventDefault();
 
@@ -92,14 +68,11 @@ form.addEventListener("submit", async function(event) {
   message.textContent = "";
 
   try {
-    const phone = normalizeVietnamPhone(
-      document.getElementById("phone").value
-    );
-
+    const email = document.getElementById("email").value.trim().toLowerCase();
     const password = document.getElementById("password").value;
 
     const { error } = await db.auth.signInWithPassword({
-      phone: phone,
+      email: email,
       password: password
     });
 

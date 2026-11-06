@@ -2,105 +2,139 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Đăng nhập - AI SCRAP WASTE PRO</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; padding: 24px 16px;
-      font-family: Arial, sans-serif;
-      background: #f3f6f4;
-    }
-    .box {
-      max-width: 420px; margin: 50px auto;
-      padding: 25px; background: white;
-      border-radius: 14px;
-      box-shadow: 0 4px 18px #0001;
-    }
-    h2 { text-align: center; color: #176b43; }
-    label { display: block; margin-top: 18px; font-weight: bold; }
-    input {
-      width: 100%; padding: 13px; margin-top: 7px;
-      border: 1px solid #ccc; border-radius: 8px;
-      font-size: 16px;
-    }
-    button {
-      width: 100%; padding: 14px; margin-top: 24px;
-      border: 0; border-radius: 8px;
-      background: #16834d; color: white;
-      font-size: 17px; font-weight: bold;
-    }
-    #message { margin-top: 16px; line-height: 1.5; }
-    .links { text-align: center; margin-top: 20px; }
-    a { color: #176b43; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đăng nhập - AI SCRAP WASTE PRO</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:24px 16px;font-family:Arial,sans-serif;background:#f3f6f4;color:#24352b}
+.box{max-width:420px;margin:50px auto;padding:25px;background:white;border-radius:14px;box-shadow:0 4px 18px #0001}
+h2{text-align:center;color:#176b43}
+h3{text-align:center}
+label{display:block;margin-top:18px;font-weight:bold}
+input{width:100%;padding:13px;margin-top:7px;border:1px solid #ccc;border-radius:8px;font-size:16px}
+button{width:100%;padding:14px;margin-top:24px;border:0;border-radius:8px;background:#16834d;color:white;font-size:17px;font-weight:bold}
+button:disabled{background:#94a3b8}
+#message{margin-top:16px;line-height:1.5;overflow-wrap:anywhere}
+.links{text-align:center;margin-top:20px;line-height:2}
+a{color:#176b43}
+.hint{font-size:13px;color:#64748b;margin-top:6px}
+</style>
 </head>
 <body>
-  <div class="box">
-    <h2>AI SCRAP WASTE PRO</h2>
-    <h3>Đăng nhập tài khoản</h3>
+<div class="box">
+<h2>AI SCRAP WASTE PRO</h2>
+<h3>Đăng nhập tài khoản / 账户登录</h3>
 
-    <form id="loginForm">
-      <label>Email</label>
-      <input id="email" type="email" required
-             placeholder="Nhập email đăng ký">
+<form id="loginForm">
+<label>Số điện thoại - 手机号</label>
+<input id="phone" type="tel" required maxlength="20"
+placeholder="0984876505" autocomplete="tel">
+<div class="hint">Ví dụ: 0984876505 hoặc +84984876505</div>
 
-      <label>Mật khẩu</label>
-      <input id="password" type="password" required
-             placeholder="Nhập mật khẩu">
+<label>Mật khẩu - 密码</label>
+<input id="password" type="password" required
+autocomplete="current-password" placeholder="Nhập mật khẩu">
 
-      <button id="loginBtn" type="submit">ĐĂNG NHẬP</button>
-    </form>
+<button id="loginBtn" type="submit">ĐĂNG NHẬP / 登录</button>
+</form>
 
-    <div id="message"></div>
+<div id="message" role="status"></div>
 
-    <div class="links">
-      Chưa có tài khoản?
-      <a href="register.html">Đăng ký</a>
-    </div>
-  </div>
+<div class="links">
+Chưa có tài khoản? / 还没有账户？<br>
+<a href="register.html">Đăng ký / 注册</a><br>
+<a href="index.html">← Trang chủ / 返回首页</a>
+</div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const supabaseClient = window.supabase.createClient(
-      "https://uddrsqankxnepjzgdatx.supabase.co",
-      "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A"
+<script>
+const SUPABASE_URL = "https://uddrsqankxnepjzgdatx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+const form = document.getElementById("loginForm");
+const message = document.getElementById("message");
+const button = document.getElementById("loginBtn");
+
+function normalizeVietnamPhone(value) {
+  let phone = value.trim().replace(/[\s().-]/g, "");
+
+  if (phone.startsWith("+84")) {
+    // Already international format
+  } else if (phone.startsWith("0084")) {
+    phone = "+" + phone.slice(2);
+  } else if (phone.startsWith("84")) {
+    phone = "+" + phone;
+  } else if (phone.startsWith("0")) {
+    phone = "+84" + phone.slice(1);
+  } else {
+    throw new Error("请填写越南手机号，例如 0984876505。");
+  }
+
+  if (!/^\+84[0-9]{9,10}$/.test(phone)) {
+    throw new Error("手机号格式不正确，请检查后重试。");
+  }
+
+  return phone;
+}
+
+form.addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  button.disabled = true;
+  button.textContent = "ĐANG ĐĂNG NHẬP...";
+  message.textContent = "";
+
+  try {
+    const phone = normalizeVietnamPhone(
+      document.getElementById("phone").value
     );
 
-    const form = document.getElementById("loginForm");
-    const message = document.getElementById("message");
-    const button = document.getElementById("loginBtn");
+    const password = document.getElementById("password").value;
 
-    form.addEventListener("submit", async function(event) {
-      event.preventDefault();
-
-      button.disabled = true;
-      button.textContent = "ĐANG ĐĂNG NHẬP...";
-      message.textContent = "";
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      const { data, error } =
-        await supabaseClient.auth.signInWithPassword({
-          email,
-          password
-        });
-
-      if (error) {
-        message.style.color = "red";
-        message.textContent = "Lỗi đăng nhập: " + error.message;
-        button.disabled = false;
-        button.textContent = "ĐĂNG NHẬP";
-        return;
-      }
-
-      message.style.color = "green";
-      message.textContent = "Đăng nhập thành công!";
-
-      window.location.href = "sell.html";
+    const { error } = await db.auth.signInWithPassword({
+      phone: phone,
+      password: password
     });
-  </script>
+
+    if (error) throw error;
+
+    message.style.color = "green";
+    message.textContent = "登录成功！正在进入平台...";
+
+    const params = new URLSearchParams(location.search);
+    const requested = params.get("redirect");
+
+    const allowedPages = [
+      "market.html",
+      "sell.html",
+      "contacts.html",
+      "index.html"
+    ];
+
+    const destination = allowedPages.includes(requested)
+      ? requested
+      : "market.html";
+
+    setTimeout(() => {
+      location.href = destination;
+    }, 700);
+
+  } catch (error) {
+    console.error(error);
+    message.style.color = "red";
+    message.textContent = "登录失败：" + error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = "ĐĂNG NHẬP / 登录";
+  }
+});
+</script>
 </body>
 </html>

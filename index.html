@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -9,9 +8,7 @@
 <title>AI SCRAP & WASTE EXCHANGE PRO</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -34,7 +31,7 @@ header h1 {
 
 header p {
   color: #d5e8df;
-  margin: 0;
+  margin: 5px 0;
   font-size: 14px;
 }
 
@@ -128,12 +125,14 @@ footer {
 
 <main>
 
-  <input
-    class="search"
-    type="search"
-    placeholder="Tìm kiếm phế liệu, vật liệu..."
-    id="searchInput"
-  >
+  <form id="searchForm">
+    <input
+      class="search"
+      type="search"
+      placeholder="Tìm kiếm phế liệu, vật liệu..."
+      id="searchInput"
+    >
+  </form>
 
   <h2>Danh mục phế liệu</h2>
 
@@ -153,7 +152,7 @@ footer {
       AI tìm người bán và người mua phù hợp trên toàn Việt Nam.
     </p>
 
-    <a class="button" href="register.html?role=seller">
+    <a class="button" href="market.html">
       AI Tìm người bán
     </a>
 
@@ -169,7 +168,7 @@ footer {
       Đăng bán phế liệu
     </a>
 
-    <a class="button secondary" href="register.html?role=buyer">
+    <a class="button secondary" href="market.html">
       Tìm nguồn hàng
     </a>
   </div>
@@ -199,12 +198,15 @@ footer {
 </footer>
 
 <script>
-document.getElementById("searchInput").addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    const keyword = this.value.trim();
-    if (keyword) {
-      window.location.href = "register.html?search=" + encodeURIComponent(keyword);
-    }
+document.getElementById("searchForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const keyword = document.getElementById("searchInput").value.trim();
+
+  if (keyword) {
+    window.location.href = "market.html?search=" + encodeURIComponent(keyword);
+  } else {
+    window.location.href = "market.html";
   }
 });
 </script>

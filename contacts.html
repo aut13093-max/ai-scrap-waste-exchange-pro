@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller Inbox | AI SCRAP WASTE PRO</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f3f6f4;
+      color: #24352b;
+    }
+    .container { max-width: 850px; margin: auto; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    h1 { font-size: 23px; margin: 0; }
+    .sub { color: #718078; font-size: 14px; margin-top: 7px; }
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .refresh { background: #167b45; color: white; }
+    .logout { background: #e8ece9; color: #34443a; }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px #0000000c;
+    }
+    .card h3 { margin: 0 0 10px; font-size: 18px; }
+    .meta { color: #68766e; font-size: 13px; line-height: 1.8; }
+    .message {
+      background: #f3f7f4;
+      border-left: 3px solid #16834b;
+      padding: 12px;
+      margin-top: 13px;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .status {
+      display: inline-block;
+      background: #e7f5eb;
+      color: #16743e;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+    .empty, .error {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      color: #68766e;
+    }
+    .error { color: #b42318; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <h1>📥 Seller Inbox</h1>
+      <div class="sub">AI SCRAP WASTE EXCHANGE PRO · Quản lý yêu cầu mua hàng</div>
+    </div>
+    <div>
+      <button class="refresh" onclick="loadContacts()">Làm mới</button>
+      <button class="logout" onclick="logout()">Đăng xuất</button>
+    </div>
+  </header>
+
+  <div id="summary" class="sub">Đang tải dữ liệu...</div>
+  <main id="inbox"></main>
+</div>
+
+<script>
+const SUPABASE_URL = "https://uddrsqankxnepjzgdatx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[char]));
+}
+
+async function loadContacts() {
+  const inbox = document.getElementById("inbox");
+  const summary = document.getElementById("summary");
+
+  inbox.innerHTML = "";
+  summary.textContent = "Đang tải dữ liệu...";
+
+  const { data: authData, error: authError } = await db.auth.getUser();
+
+  if (authError || !authData.user) {
+    location.href = "login.html?redirect=contacts.html";
+    return;
+  }
+
+  const user = authData.user;
+
+  const { data: contacts, error } = await db
+    .from("trade_contacts")
+    .select("id, listing_id, message, status, created_at")
+    .eq("seller_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    summary.textContent = "";
+    inbox.innerHTML =
+      '<div class="error">Không thể tải yêu cầu mua hàng: ' +
+      escapeHTML(error.message) +
+      '</div>';
+    return;
+  }
+
+  if (!contacts || contacts.length === 0) {
+    summary.textContent = "0 yêu cầu mua hàng";
+    inbox.innerHTML =
+      '<div class="empty">Chưa có yêu cầu mua hàng nào.</div>';
+    return;
+  }
+
+  const listingIds = [...new Set(
+    contacts.map(item => item.listing_id).filter(Boolean)
+  )];
+
+  let listingMap = {};
+
+  if (listingIds.length > 0) {
+    const { data: listings, error: listingError } = await db
+      .from("scrap_listings")
+      .select("id, title, category, quantity, unit, province")
+      .in("id", listingIds);
+
+    if (!listingError && listings) {
+      listings.forEach(item => {
+        listingMap[item.id] = item;
+      });
+    }
+  }
+
+  summary.textContent = contacts.length + " yêu cầu mua hàng";
+
+  inbox.innerHTML = contacts.map(contact => {
+    const listing = listingMap[contact.listing_id];
+    const title = listing
+      ? listing.title
+      : "Sản phẩm #" + String(contact.listing_id || "").slice(0, 8);
+
+    const date = contact.created_at
+      ? new Date(contact.created_at).toLocaleString("vi-VN")
+      : "Không rõ thời gian";
+
+    return `
+      <section class="card">
+        <h3>${escapeHTML(title)}</h3>
+
+        <div class="meta">
+          ${listing ? `
+            Danh mục: ${escapeHTML(listing.category || "Chưa cập nhật")}<br>
+            Số lượng: ${escapeHTML(listing.quantity ?? "")}
+            ${escapeHTML(listing.unit || "")}<br>
+            Khu vực: ${escapeHTML(listing.province || "Chưa cập nhật")}<br>
+          ` : ""}
+          Thời gian: ${escapeHTML(date)}
+        </div>
+
+        <div class="message">
+          ${escapeHTML(contact.message || "Không có nội dung")}
+        </div>
+
+        <span class="status">
+          Trạng thái: ${escapeHTML(contact.status || "pending")}
+        </span>
+      </section>
+    `;
+  }).join("");
+}
+
+async function logout() {
+  await db.auth.signOut();
+  location.href = "login.html";
+}
+
+loadContacts();
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng nhập - AI SCRAP WASTE PRO</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px 16px;
+      font-family: Arial, sans-serif;
+      background: #f3f6f4;
+    }
+    .box {
+      max-width: 420px; margin: 50px auto;
+      padding: 25px; background: white;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px #0001;
+    }
+    h2 { text-align: center; color: #176b43; }
+    label { display: block; margin-top: 18px; font-weight: bold; }
+    input {
+      width: 100%; padding: 13px; margin-top: 7px;
+      border: 1px solid #ccc; border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%; padding: 14px; margin-top: 24px;
+      border: 0; border-radius: 8px;
+      background: #16834d; color: white;
+      font-size: 17px; font-weight: bold;
+    }
+    #message { margin-top: 16px; line-height: 1.5; }
+    .links { text-align: center; margin-top: 20px; }
+    a { color: #176b43; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>AI SCRAP WASTE PRO</h2>
+    <h3>Đăng nhập tài khoản</h3>
+
+    <form id="loginForm">
+      <label>Email</label>
+      <input id="email" type="email" required
+             placeholder="Nhập email đăng ký">
+
+      <label>Mật khẩu</label>
+      <input id="password" type="password" required
+             placeholder="Nhập mật khẩu">
+
+      <button id="loginBtn" type="submit">ĐĂNG NHẬP</button>
+    </form>
+
+    <div id="message"></div>
+
+    <div class="links">
+      Chưa có tài khoản?
+      <a href="register.html">Đăng ký</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseClient = window.supabase.createClient(
+      "https://uddrsqankxnepjzgdatx.supabase.co",
+      "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A"
+    );
+
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("message");
+    const button = document.getElementById("loginBtn");
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      button.disabled = true;
+      button.textContent = "ĐANG ĐĂNG NHẬP...";
+      message.textContent = "";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) {
+        message.style.color = "red";
+        message.textContent = "Lỗi đăng nhập: " + error.message;
+        button.disabled = false;
+        button.textContent = "ĐĂNG NHẬP";
+        return;
+      }
+
+      message.style.color = "green";
+      message.textContent = "Đăng nhập thành công!";
+
+      window.location.href = "sell.html";
+    });
+  </script>
+</body>
+</html>

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -9,132 +8,60 @@
 
 <style>
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f3f6f4;
-  color:#222;
-}
-header{
-  background:#176b43;
-  color:white;
-  padding:20px 16px;
-}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f6f4;color:#222}
+header{background:#176b43;color:white;padding:20px 16px}
 header h2{margin:0 0 8px}
 header p{margin:0;font-size:14px}
-.container{
-  max-width:1000px;
-  margin:auto;
-  padding:16px;
-}
-.search{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-bottom:18px;
-}
-input,select{
-  padding:13px;
-  border:1px solid #ccc;
-  border-radius:8px;
-  font-size:15px;
-  background:white;
-}
+.container{max-width:1000px;margin:auto;padding:16px}
+.search{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+input,select,textarea{padding:13px;border:1px solid #ccc;border-radius:8px;font-size:15px;background:white}
 input{flex:1;min-width:180px}
 select{min-width:140px}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:14px;
-}
-.card{
-  background:white;
-  border-radius:12px;
-  padding:16px;
-  box-shadow:0 2px 8px #0001;
-}
-.card h3{
-  margin:12px 0;
-  color:#176b43;
-}
-.price{
-  font-size:20px;
-  font-weight:bold;
-  color:#d66a16;
-  margin:12px 0;
-}
-.info{
-  font-size:14px;
-  line-height:1.8;
-  color:#555;
-  overflow-wrap:anywhere;
-}
-.tag{
-  display:inline-block;
-  background:#e8f4ec;
-  color:#176b43;
-  padding:5px 9px;
-  border-radius:20px;
-  font-size:12px;
-}
-.empty{
-  background:white;
-  padding:22px;
-  border-radius:10px;
-  text-align:center;
-  grid-column:1/-1;
-}
-.links{
-  margin:22px 0;
-  display:flex;
-  gap:18px;
-  flex-wrap:wrap;
-}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px #0001}
+.card h3{margin:12px 0;color:#176b43}
+.price{font-size:20px;font-weight:bold;color:#d66a16;margin:12px 0}
+.info{font-size:14px;line-height:1.8;color:#555;overflow-wrap:anywhere}
+.tag{display:inline-block;background:#e8f4ec;color:#176b43;padding:5px 9px;border-radius:20px;font-size:12px}
+.empty{background:white;padding:22px;border-radius:10px;text-align:center;grid-column:1/-1}
+.links{margin:22px 0;display:flex;gap:18px;flex-wrap:wrap}
 a{color:#176b43}
-button{
-  border:0;
-  background:#176b43;
-  color:white;
-  padding:11px 18px;
-  border-radius:8px;
-  font-size:15px;
-  cursor:pointer;
-}
+button{border:0;background:#176b43;color:white;padding:11px 18px;border-radius:8px;font-size:15px;cursor:pointer}
+.contact-btn{width:100%;margin-top:14px;background:#138451}
+button:disabled{opacity:.5}
 .error{color:#c62828}
+#notice{padding:12px;border-radius:8px;margin:12px 0;white-space:pre-wrap}
+#notice:empty{display:none}
 </style>
 </head>
 
 <body>
-
 <header>
   <h2>AI SCRAP WASTE PRO</h2>
   <p>Chợ mua bán phế liệu và chất thải</p>
 </header>
 
 <div class="container">
-
   <h3>Danh sách sản phẩm đang bán</h3>
 
   <div class="search">
-    <input
-      id="search"
-      type="search"
-      placeholder="Tìm tên sản phẩm, vật liệu..."
-    >
-
+    <input id="search" type="search"
+      placeholder="Tìm tên sản phẩm, vật liệu...">
     <select id="category">
       <option value="">Tất cả danh mục</option>
       <option value="Kim loại">Kim loại</option>
       <option value="Nhựa">Nhựa</option>
-      <option value="Giấy & Carton">Giấy & Carton</option>
-      <option value="Điện tử">Điện tử</option>
+      <option value="Giấy và bìa carton">Giấy và bìa carton</option>
+      <option value="Phế liệu điện tử">Phế liệu điện tử</option>
       <option value="Vật liệu xây dựng">Vật liệu xây dựng</option>
-      <option value="Gỗ & Cao su">Gỗ & Cao su</option>
+      <option value="Vải và dệt may">Vải và dệt may</option>
+      <option value="Cao su">Cao su</option>
+      <option value="Gỗ">Gỗ</option>
     </select>
   </div>
 
+  <div id="notice"></div>
   <p id="count">Đang tải sản phẩm...</p>
-
   <div id="products" class="grid"></div>
 
   <div class="links">
@@ -142,11 +69,9 @@ button{
     <a href="index.html">Trang chủ</a>
     <a href="login.html">Đăng nhập</a>
   </div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
 const db = window.supabase.createClient(
   "https://uddrsqankxnepjzgdatx.supabase.co",
@@ -157,110 +82,158 @@ const products = document.getElementById("products");
 const count = document.getElementById("count");
 const search = document.getElementById("search");
 const category = document.getElementById("category");
+const notice = document.getElementById("notice");
 
 let allItems = [];
 
 function safe(value){
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
+  return String(value ?? "").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 }
 
 function money(value){
-  if(value === null || value === undefined || value === ""){
-    return "Liên hệ";
+  if(value===null || value===undefined || value===""){
+    return "Liên hệ giá";
   }
+  return Number(value).toLocaleString("vi-VN")+" VND";
+}
 
-  return Number(value).toLocaleString("vi-VN") + " VND";
+function showNotice(text,isError=false){
+  notice.textContent=text;
+  notice.style.background=isError?"#ffe8e8":"#e2f7e9";
+  notice.style.color=isError?"#a12626":"#176b43";
 }
 
 function render(){
-  const keyword = search.value.trim().toLowerCase();
-  const selected = category.value;
+  const keyword=search.value.trim().toLowerCase();
+  const selected=category.value;
 
-  const filtered = allItems.filter(item => {
-    const text = [
-      item.title,
-      item.material,
-      item.description,
-      item.province,
-      item.category
+  const filtered=allItems.filter(item=>{
+    const text=[
+      item.title,item.material,item.description,
+      item.province,item.category
     ].join(" ").toLowerCase();
 
     return text.includes(keyword) &&
-      (!selected || item.category === selected);
+      (!selected || item.category===selected);
   });
 
-  count.textContent = "Tìm thấy " + filtered.length + " sản phẩm";
+  count.textContent="Tìm thấy "+filtered.length+" sản phẩm";
 
-  if(filtered.length === 0){
-    products.innerHTML =
-      '<div class="empty">Chưa tìm thấy sản phẩm phù hợp.</div>';
+  if(!filtered.length){
+    products.innerHTML='<div class="empty">Chưa tìm thấy sản phẩm phù hợp.</div>';
     return;
   }
 
-  products.innerHTML = filtered.map(item => `
+  products.innerHTML=filtered.map(item=>`
     <article class="card">
-      <span class="tag">${safe(item.category || "Khác")}</span>
-
+      <span class="tag">${safe(item.category||"Khác")}</span>
       <h3>${safe(item.title)}</h3>
-
       <div class="info">
-        <b>Vật liệu:</b>
-        ${safe(item.material || "Chưa cập nhật")}<br>
-
-        <b>Số lượng:</b>
-        ${safe(item.quantity)} ${safe(item.unit)}<br>
-
-        <b>Khu vực:</b>
-        ${safe(item.province || "Chưa cập nhật")}
+        <b>Vật liệu:</b> ${safe(item.material||"Chưa cập nhật")}<br>
+        <b>Số lượng:</b> ${safe(item.quantity)} ${safe(item.unit)}<br>
+        <b>Khu vực:</b> ${safe(item.province||"Chưa cập nhật")}
       </div>
-
       <div class="price">${money(item.price)}</div>
-
-      <div class="info">
-        ${safe(item.description || "Chưa có mô tả")}
-      </div>
+      <div class="info">${safe(item.description||"Chưa có mô tả")}</div>
+      <button class="contact-btn" data-id="${safe(item.id)}">
+        Liên hệ người bán
+      </button>
     </article>
   `).join("");
 }
 
 async function loadProducts(){
-  count.textContent = "Đang tải sản phẩm...";
-  products.innerHTML = "";
+  count.textContent="Đang tải sản phẩm...";
+  products.innerHTML="";
 
-  const {data,error} = await db
+  const {data,error}=await db
     .from("scrap_listings")
-    .select(
-      "id,title,category,material,description,quantity,unit,price,province,created_at"
-    )
+    .select("id,title,category,material,description,quantity,unit,price,province,created_at,seller_id")
     .eq("status","active")
     .order("created_at",{ascending:false});
 
   if(error){
-    count.innerHTML =
-      '<span class="error">Lỗi tải sản phẩm: ' +
-      safe(error.message) + '</span>';
-
-    products.innerHTML =
-      '<div class="empty"><button onclick="loadProducts()">Tải lại</button></div>';
-
+    count.innerHTML='<span class="error">Lỗi tải sản phẩm: '+safe(error.message)+'</span>';
+    products.innerHTML='<div class="empty"><button onclick="loadProducts()">Tải lại</button></div>';
     return;
   }
 
-  allItems = data || [];
+  allItems=data||[];
+
+  const params=new URLSearchParams(window.location.search);
+  const initialSearch=params.get("search");
+  if(initialSearch) search.value=initialSearch;
+
   render();
 }
+
+products.addEventListener("click",async function(event){
+  const button=event.target.closest(".contact-btn");
+  if(!button) return;
+
+  const listingId=button.dataset.id;
+  const item=allItems.find(x=>String(x.id)===String(listingId));
+
+  if(!item) return;
+
+  button.disabled=true;
+  button.textContent="Đang kiểm tra...";
+
+  try{
+    const {data:authData,error:authError}=await db.auth.getUser();
+
+    if(authError || !authData.user){
+      window.location.href="login.html?redirect=market.html";
+      return;
+    }
+
+    const user=authData.user;
+
+    if(user.id===item.seller_id){
+      showNotice("Đây là sản phẩm do chính tài khoản của bạn đăng bán。");
+      return;
+    }
+
+    const message=window.prompt(
+      "Nhập lời nhắn gửi người bán:",
+      "Tôi quan tâm đến sản phẩm này. Vui lòng liên hệ với tôi."
+    );
+
+    if(message===null) return;
+
+    if(!message.trim()){
+      showNotice("Vui lòng nhập nội dung liên hệ.",true);
+      return;
+    }
+
+    const {error}=await db
+      .from("trade_contacts")
+      .insert({
+        listing_id:item.id,
+        buyer_id:user.id,
+        seller_id:item.seller_id,
+        message:message.trim(),
+        status:"pending"
+      });
+
+    if(error) throw error;
+
+    showNotice("Đã gửi yêu cầu liên hệ thành công! Người bán có thể xem yêu cầu của bạn.");
+
+  }catch(error){
+    showNotice("Không thể gửi yêu cầu: "+error.message,true);
+  }finally{
+    button.disabled=false;
+    button.textContent="Liên hệ người bán";
+  }
+});
 
 search.addEventListener("input",render);
 category.addEventListener("change",render);
 
 loadProducts();
 </script>
-
 </body>
 </html>

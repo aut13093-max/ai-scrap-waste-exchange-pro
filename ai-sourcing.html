@@ -1,144 +1,482 @@
 
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Smart Sourcing - AI SCRAP</title>
+
+<title>AI 智能找货平台 | AI Smart Sourcing</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;padding:18px;background:#f1f5f9;font-family:Arial,sans-serif;color:#172033}
-.wrap{max-width:900px;margin:12px auto}
-.card{background:#fff;padding:20px;border-radius:14px;box-shadow:0 4px 18px #0001;margin-bottom:16px}
-h1{font-size:23px;color:#087e65;margin:0 0 8px}
-.sub{color:#64748b;line-height:1.5}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
-label{display:block;font-weight:bold;margin:12px 0 6px}
-input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px;background:white}
-button{border:0;border-radius:8px;padding:12px 16px;background:#087e65;color:white;font-weight:bold;font-size:15px;cursor:pointer}
-button:disabled{background:#94a3b8}
-.primary{width:100%;margin-top:18px}
-.result{border:1px solid #e2e8f0;border-radius:12px;padding:15px;margin-top:12px}
-.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
-.score{background:#dcfce7;color:#166534;padding:6px 10px;border-radius:20px;font-weight:bold;font-size:13px}
-.meta{color:#475569;font-size:14px;line-height:1.7;margin:8px 0}
-.small{font-size:13px;color:#64748b}
-.empty{padding:18px;background:#f8fafc;border-radius:8px;color:#475569}
-#error{color:#b91c1c;white-space:pre-wrap}
-nav{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0}
-a{color:#087e65}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 18px;
+  background: #f1f5f9;
+  font-family: "Noto Sans SC", "Noto Sans", Arial, sans-serif;
+  color: #172033;
+}
+
+.wrap {
+  max-width: 900px;
+  margin: 12px auto;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px #0001;
+  margin-bottom: 16px;
+}
+
+h1 {
+  font-size: 23px;
+  color: #087e65;
+  margin: 0 0 8px;
+}
+
+h2 {
+  font-size: 19px;
+  margin-top: 0;
+}
+
+h3 {
+  font-size: 17px;
+  margin: 0;
+}
+
+.sub {
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin: 12px 0 6px;
+  line-height: 1.6;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+  color: #172033;
+  font-family: inherit;
+}
+
+input::placeholder {
+  color: #94a3b8;
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  background: #087e65;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background: #06644f;
+}
+
+.primary {
+  width: 100%;
+  margin-top: 18px;
+  padding: 15px;
+}
+
+.result {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 12px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.score {
+  background: #dcfce7;
+  color: #166534;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.meta {
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.9;
+  margin: 8px 0;
+}
+
+.small {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.empty {
+  padding: 18px;
+  background: #f8fafc;
+  border-radius: 8px;
+  color: #475569;
+  line-height: 1.8;
+}
+
+#error {
+  color: #b91c1c;
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+
+#status {
+  line-height: 1.7;
+}
+
+nav {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+
+a {
+  color: #087e65;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.contact-button {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.footer-note {
+  text-align: center;
+  padding: 10px;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 21px;
+  }
+}
 </style>
 </head>
+
 <body>
+
 <div class="wrap">
 
+<!-- 页面标题 -->
 <section class="card">
-<h1>AI SMART SOURCING</h1>
-<div class="sub">Tìm nguồn hàng phế liệu phù hợp / AI 智能寻找废料货源</div>
+
+<h1>AI 智能找货平台</h1>
+
+<div class="sub">
+AI SMART SOURCING
+<br>
+Tìm nguồn hàng phế liệu thông minh
+</div>
+
 <nav>
-<a href="market.html">市场 Market</a>
-<a href="sell.html">发布商品 Sell</a>
-<a href="contacts.html">联系记录 Contacts</a>
-<a href="index.html">首页 Home</a>
+<a href="index.html">首页 / Trang chủ</a>
+<a href="market.html">商品市场 / Chợ hàng</a>
+<a href="sell.html">发布商品 / Đăng bán</a>
+<a href="contacts.html">联系记录 / Liên hệ</a>
 </nav>
-<p class="sub">输入采购需求，系统会从平台当前有效商品中筛选并按匹配度排序。</p>
+
+<p class="sub">
+买家输入采购需求，系统自动搜索平台上的有效商品，并按照匹配程度排序。
+<br>
+Người mua nhập nhu cầu, hệ thống tìm kiếm và sắp xếp nguồn hàng phù hợp.
+</p>
+
 </section>
 
+<!-- 采购需求 -->
 <section class="card">
+
 <h2>采购需求 / Yêu cầu tìm hàng</h2>
+
 <form id="searchForm">
+
 <div class="grid">
 
 <div>
-<label for="keyword">材料或商品 / Loại vật liệu</label>
-<input id="keyword" placeholder="例如：铜、铁、铝、塑料 / Đồng, sắt...">
+<label for="keyword">
+材料或商品 / Loại vật liệu
+</label>
+
+<input
+id="keyword"
+type="text"
+placeholder="例如：铜、铁、铝、塑料 / Ví dụ: đồng, sắt, nhôm, nhựa"
+>
 </div>
 
 <div>
-<label for="province">省市 / Tỉnh thành</label>
-<input id="province" placeholder="例如：Thành phố Hồ Chí Minh">
+<label for="province">
+省市 / Tỉnh thành
+</label>
+
+<input
+id="province"
+type="text"
+placeholder="例如：胡志明市 / Thành phố Hồ Chí Minh"
+>
 </div>
 
 <div>
-<label for="quantity">需要数量 / Số lượng cần</label>
-<input id="quantity" type="number" min="0" step="any" placeholder="例如：500">
+<label for="quantity">
+需要数量 / Số lượng cần
+</label>
+
+<input
+id="quantity"
+type="number"
+min="0"
+step="any"
+placeholder="例如：500"
+>
 </div>
 
 <div>
-<label for="unit">单位 / Đơn vị</label>
+<label for="unit">
+单位 / Đơn vị
+</label>
+
 <select id="unit">
-<option value="">不限 / Không giới hạn</option>
-<option value="kg">kg</option>
-<option value="ton">吨 / tấn</option>
-<option value="piece">件 / cái</option>
-<option value="other">其他 / Khác</option>
+
+<option value="">
+不限 / Không giới hạn
+</option>
+
+<option value="kg">
+公斤 / Kilogram (kg)
+</option>
+
+<option value="ton">
+吨 / Tấn
+</option>
+
+<option value="piece">
+件 / Cái
+</option>
+
+<option value="other">
+其他 / Khác
+</option>
+
 </select>
 </div>
 
 <div>
-<label for="maxPrice">最高单价预算（可选）/ Giá tối đa</label>
-<input id="maxPrice" type="number" min="0" step="any" placeholder="最高预算">
+<label for="maxPrice">
+最高单价预算（可选）/ Giá tối đa
+</label>
+
+<input
+id="maxPrice"
+type="number"
+min="0"
+step="any"
+placeholder="输入最高预算 / Nhập giá tối đa"
+>
 </div>
 
 </div>
-<button class="primary" id="searchBtn" type="submit">AI 开始寻找货源 / Tìm nguồn hàng</button>
+
+<button
+class="primary"
+id="searchBtn"
+type="submit"
+>
+AI 开始寻找货源 / Tìm nguồn hàng
+</button>
+
 </form>
 
 <p id="status" class="small" aria-live="polite"></p>
+
 <p id="error"></p>
+
 </section>
 
+<!-- 匹配结果 -->
 <section class="card">
+
 <div class="top">
+
 <h2>匹配货源 / Nguồn hàng phù hợp</h2>
+
 <span id="count" class="small"></span>
+
 </div>
+
 <div id="results">
-<div class="empty">输入采购条件后，点击“开始寻找货源”。</div>
+
+<div class="empty">
+请输入采购条件，然后点击“AI 开始寻找货源”。
+<br>
+Vui lòng nhập nhu cầu và nhấn "Tìm nguồn hàng".
 </div>
+
+</div>
+
 </section>
+
+<!-- 说明 -->
+<section class="card">
+
+<h2>系统说明 / Hướng dẫn</h2>
 
 <p class="small">
-说明：当前版本使用商品名称、类别、地区、数量和价格进行规则评分排序，并非生成式 AI 自动判断。只展示平台中 status = active 的商品。
+当前版本根据商品名称、材料、地区、数量和价格进行规则匹配评分。
 </p>
+
+<p class="small">
+Phiên bản hiện tại sử dụng tên sản phẩm, vật liệu, khu vực, số lượng và giá để tính điểm phù hợp.
+</p>
+
+<p class="small">
+目前是第一版智能匹配系统，并非生成式 AI。系统只搜索平台中状态为 active 的商品。
+</p>
+
+</section>
+
+<p class="small footer-note">
+AI SCRAP & WASTE EXCHANGE PRO
+</p>
+
 </div>
 
 <script>
-const SUPABASE_URL = "https://uddrsqankxnepjzgdatx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A";
+
+// ==================================
+// SUPABASE DATABASE CONNECTION
+// ==================================
+
+const SUPABASE_URL =
+"https://uddrsqankxnepjzgdatx.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_MpGMJBtACKRil4Aa8eQttw_fGyHRn5A";
 
 const db = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
 
+
+// ==================================
+// PAGE ELEMENTS
+// ==================================
+
 const form = document.getElementById("searchForm");
+
 const results = document.getElementById("results");
+
 const statusEl = document.getElementById("status");
+
 const errorEl = document.getElementById("error");
+
 const countEl = document.getElementById("count");
+
 const searchBtn = document.getElementById("searchBtn");
 
+
+// ==================================
+// TEXT NORMALIZATION
+// 支持越南文带声调搜索
+// ==================================
+
 function norm(value) {
+
   return String(value || "")
     .toLocaleLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .trim();
+
 }
+
+
+// ==================================
+// HTML SAFETY
+// ==================================
 
 function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  }[c]));
+
+  return String(value ?? "").replace(/[&<>"']/g, function(c) {
+
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[c];
+
+  });
+
 }
 
+
+// ==================================
+// SMART MATCHING SCORE
+// ==================================
+
 function scoreListing(item, criteria) {
+
   let score = 0;
 
   const text = norm([
@@ -149,171 +487,371 @@ function scoreListing(item, criteria) {
   ].join(" "));
 
   const keyword = norm(criteria.keyword);
+
   const province = norm(item.province);
+
   const wantedProvince = norm(criteria.province);
 
+
+  // 1. Material matching
+
   if (keyword) {
+
     const terms = keyword.split(/\s+/).filter(Boolean);
+
     const hits = terms.filter(term => text.includes(term)).length;
+
     score += Math.round(45 * hits / terms.length);
+
   } else {
+
     score += 20;
+
   }
 
+
+  // 2. Province matching
+
   if (wantedProvince) {
+
     if (province === wantedProvince) {
+
       score += 30;
+
     } else if (
       province.includes(wantedProvince) ||
       wantedProvince.includes(province)
     ) {
+
       score += 20;
+
     }
+
   } else {
+
     score += 10;
+
   }
 
+
+  // 3. Quantity matching
+
   if (criteria.quantity > 0) {
+
     const available = Number(item.quantity) || 0;
 
     if (available >= criteria.quantity) {
+
       score += 25;
+
     } else if (available > 0) {
-      score += Math.round(15 * available / criteria.quantity);
+
+      score += Math.round(
+        15 * available / criteria.quantity
+      );
+
     }
+
   } else {
+
     score += 15;
+
   }
+
+
+  // 4. Price matching
 
   if (
     criteria.maxPrice > 0 &&
     item.price != null &&
     Number(item.price) > 0
   ) {
+
     if (Number(item.price) <= criteria.maxPrice) {
+
       score += 10;
+
     }
+
   } else {
+
     score += 10;
+
   }
 
   return Math.min(score, 100);
+
 }
 
+
+// ==================================
+// DISPLAY SEARCH RESULTS
+// ==================================
+
 function render(items) {
-  countEl.textContent = `${items.length} 个结果 / kết quả`;
+
+  countEl.textContent =
+    `${items.length} 个结果 / ${items.length} kết quả`;
 
   if (!items.length) {
+
     results.innerHTML = `
       <div class="empty">
         没有找到符合条件的有效商品。
-        可以尝试放宽地区、数量或关键词。
         <br>
         Không tìm thấy nguồn hàng phù hợp.
+        <br>
+        请尝试更换关键词或放宽搜索条件。
+        <br>
+        Vui lòng thử từ khóa hoặc điều kiện khác.
       </div>
     `;
+
     return;
+
   }
 
+
   results.innerHTML = items.map(({item, score}) => `
+
     <article class="result">
+
       <div class="top">
-        <h3>${escapeHtml(item.title || item.material || "未命名商品")}</h3>
-        <span class="score">匹配度 ${score}%</span>
+
+        <h3>
+          ${escapeHtml(item.title || item.material || "未命名商品")}
+        </h3>
+
+        <span class="score">
+          匹配度 ${score}%
+        </span>
+
       </div>
 
       <div class="meta">
-        材料：${escapeHtml(item.material || item.category || "未注明")}<br>
-        数量：${escapeHtml(item.quantity)} ${escapeHtml(item.unit || "")}<br>
-        地区：${escapeHtml(item.province || "未注明")}<br>
-        价格：${
+
+        材料 / Vật liệu：
+        ${escapeHtml(item.material || item.category || "未注明")}
+        <br>
+
+        数量 / Số lượng：
+        ${escapeHtml(item.quantity)}
+        ${escapeHtml(item.unit || "")}
+        <br>
+
+        地区 / Khu vực：
+        ${escapeHtml(item.province || "未注明")}
+        <br>
+
+        价格 / Giá：
+        ${
           item.price == null || Number(item.price) === 0
-          ? "联系卖家 / Liên hệ"
+          ? "联系卖家 / Liên hệ người bán"
           : escapeHtml(item.price)
         }
+
       </div>
 
-      <p>${escapeHtml(item.description || "")}</p>
+      <p>
+        ${escapeHtml(item.description || "")}
+      </p>
 
-      <button type="button" data-contact="${escapeHtml(item.id)}">
+      <button
+        type="button"
+        class="contact-button"
+        data-contact="${escapeHtml(item.id)}"
+      >
         联系卖家 / Liên hệ người bán
       </button>
+
     </article>
+
   `).join("");
 
+
   results.querySelectorAll("[data-contact]").forEach(btn => {
-    btn.addEventListener("click", () => {
+
+    btn.addEventListener("click", function() {
+
       contactSeller(btn.dataset.contact);
+
     });
+
   });
+
 }
+
+
+// ==================================
+// CONTACT SELLER
+// ==================================
 
 async function contactSeller(listingId) {
-  const {data: userData, error: userError} = await db.auth.getUser();
+
+  const {data: userData, error: userError} =
+    await db.auth.getUser();
+
+
+  // Require login
 
   if (userError || !userData.user) {
-    location.href = "login.html?redirect=ai-sourcing.html";
+
+    location.href =
+      "login.html?redirect=ai-sourcing.html";
+
     return;
+
   }
+
+
+  // Get listing
 
   const {data: listing, error: listingError} = await db
+
     .from("scrap_listings")
+
     .select("id,seller_id,title")
+
     .eq("id", listingId)
+
     .single();
 
+
   if (listingError) {
-    alert("无法读取商品：" + listingError.message);
+
+    alert(
+      "无法读取商品 / Không thể đọc sản phẩm："
+      + listingError.message
+    );
+
     return;
+
   }
+
+
+  // Prevent contacting own listing
 
   if (listing.seller_id === userData.user.id) {
-    alert("这是你自己发布的商品。/ Đây là sản phẩm của bạn.");
+
+    alert(
+      "这是你自己发布的商品。/ Đây là sản phẩm của bạn."
+    );
+
     return;
+
   }
+
+
+  // Buyer message
 
   const message = prompt(
+
     "请输入采购询问内容 / Nhập nội dung hỏi mua:",
+
     "我对这个商品有采购意向，请联系我。"
+
   );
 
-  if (message === null || !message.trim()) return;
 
-  const {error} = await db.from("trade_contacts").insert({
-    listing_id: listing.id,
-    buyer_id: userData.user.id,
-    seller_id: listing.seller_id,
-    message: message.trim(),
-    status: "pending"
-  });
+  if (message === null || !message.trim()) {
+
+    return;
+
+  }
+
+
+  // Insert contact request
+
+  const {error} = await db
+
+    .from("trade_contacts")
+
+    .insert({
+
+      listing_id: listing.id,
+
+      buyer_id: userData.user.id,
+
+      seller_id: listing.seller_id,
+
+      message: message.trim(),
+
+      status: "pending"
+
+    });
+
 
   if (error) {
-    alert("发送失败：" + error.message);
+
+    alert(
+      "发送失败 / Gửi thất bại："
+      + error.message
+    );
+
   } else {
-    alert("采购询问已发送给卖家。/ Đã gửi yêu cầu cho người bán.");
+
+    alert(
+      "采购询问已发送给卖家。/ Đã gửi yêu cầu cho người bán."
+    );
+
   }
+
 }
 
-form.addEventListener("submit", async event => {
+
+// ==================================
+// SEARCH LISTINGS
+// ==================================
+
+form.addEventListener("submit", async function(event) {
+
   event.preventDefault();
 
   errorEl.textContent = "";
+
+  countEl.textContent = "";
+
   searchBtn.disabled = true;
-  searchBtn.textContent = "正在搜索... / Đang tìm...";
-  statusEl.textContent = "正在读取平台有效商品...";
+
+  searchBtn.textContent =
+    "正在搜索... / Đang tìm kiếm...";
+
+  statusEl.textContent =
+    "正在读取平台有效商品... / Đang tải sản phẩm...";
+
   results.innerHTML = "";
 
+
+  // Read search conditions
+
   const criteria = {
-    keyword: document.getElementById("keyword").value.trim(),
-    province: document.getElementById("province").value.trim(),
-    quantity: Number(document.getElementById("quantity").value) || 0,
-    unit: document.getElementById("unit").value,
-    maxPrice: Number(document.getElementById("maxPrice").value) || 0
+
+    keyword:
+      document.getElementById("keyword").value.trim(),
+
+    province:
+      document.getElementById("province").value.trim(),
+
+    quantity:
+      Number(document.getElementById("quantity").value) || 0,
+
+    unit:
+      document.getElementById("unit").value,
+
+    maxPrice:
+      Number(document.getElementById("maxPrice").value) || 0
+
   };
 
+
   try {
+
+    // Read active listings
+
     let query = db
+
       .from("scrap_listings")
+
       .select(`
         id,
         seller_id,
@@ -328,68 +866,145 @@ form.addEventListener("submit", async event => {
         status,
         created_at
       `)
+
       .eq("status", "active")
-      .order("created_at", {ascending:false})
+
+      .order("created_at", {
+        ascending: false
+      })
+
       .limit(100);
 
+
+    // Unit filter
+
     if (criteria.unit) {
+
       query = query.eq("unit", criteria.unit);
+
     }
+
 
     const {data, error} = await query;
 
-    if (error) throw error;
+
+    if (error) {
+
+      throw error;
+
+    }
+
+
+    // Calculate matching scores
 
     const ranked = (data || [])
+
       .map(item => ({
+
         item,
+
         score: scoreListing(item, criteria)
+
       }))
+
+
+      // Filter results
+
       .filter(row => {
-        if (criteria.keyword && row.score < 15) return false;
+
+        if (
+          criteria.keyword &&
+          row.score < 15
+        ) {
+
+          return false;
+
+        }
+
 
         if (
           criteria.province &&
-          !norm(row.item.province).includes(norm(criteria.province))
+          !norm(row.item.province).includes(
+            norm(criteria.province)
+          )
         ) {
+
           return false;
+
         }
+
 
         if (
           criteria.quantity > 0 &&
           Number(row.item.quantity) <= 0
         ) {
+
           return false;
+
         }
+
 
         if (
           criteria.maxPrice > 0 &&
           row.item.price != null &&
           Number(row.item.price) > criteria.maxPrice
         ) {
+
           return false;
+
         }
 
+
         return true;
+
       })
-      .sort((a,b) => b.score - a.score);
+
+
+      // Highest score first
+
+      .sort((a, b) => b.score - a.score);
+
 
     render(ranked);
 
+
     statusEl.textContent =
+
       `搜索完成：检查了 ${data?.length || 0} 条有效商品。`;
 
+
   } catch (error) {
+
     console.error(error);
-    errorEl.textContent = "搜索失败：" + error.message;
+
+    errorEl.textContent =
+      "搜索失败 / Tìm kiếm thất bại："
+      + error.message;
+
     results.innerHTML = `
-      <div class="empty">请检查网络或数据库权限。</div>
+
+      <div class="empty">
+
+        请检查网络或数据库权限。
+        <br>
+        Vui lòng kiểm tra kết nối mạng hoặc quyền cơ sở dữ liệu.
+
+      </div>
+
     `;
+
   } finally {
+
     searchBtn.disabled = false;
-    searchBtn.textContent = "AI 开始寻找货源 / Tìm nguồn hàng";
+
+    searchBtn.textContent =
+      "AI 开始寻找货源 / Tìm nguồn hàng";
+
   }
+
 });
+
 </script>
+
 </body>
 </html>

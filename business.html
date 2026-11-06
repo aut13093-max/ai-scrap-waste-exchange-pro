@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI SCRAP – Chợ Phế Liệu Thông Minh | Thu Mua Phế Liệu Toàn Quốc</title>
+<meta name="description" content="AI SCRAP - Chợ phế liệu thông minh tại Việt Nam. Kết nối người mua và người bán phế liệu, kim loại, nhựa và chất thải tái chế trên toàn quốc.">
+<meta name="keywords" content="AI SCRAP, thu mua phế liệu, bán phế liệu, chợ phế liệu, tái chế, phế liệu Việt Nam">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://ai-scrap-waste-exchange-pro.vercel.app/business.html">
+<meta property="og:title" content="AI SCRAP – Chợ Phế Liệu Thông Minh">
+<meta property="og:description" content="Tìm kiếm và kết nối mua bán phế liệu trên toàn Việt Nam.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ai-scrap-waste-exchange-pro.vercel.app/business.html">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:#172033;font-family:Arial,sans-serif}
+header{background:#075e4d;color:white;padding:32px 18px}
+.wrap{max-width:950px;margin:auto}
+h1{font-size:32px;margin:0 0 10px}
+header p{line-height:1.7;margin:5px 0}
+nav{margin-top:20px;display:flex;gap:15px;flex-wrap:wrap}
+nav a{color:white}
+main{padding:20px 14px}
+.card{background:white;padding:20px;border-radius:14px;margin:0 0 18px;box-shadow:0 3px 15px #0000000b}
+h2{font-size:21px;margin-top:0}
+.muted{color:#64748b;line-height:1.7}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.item{border:1px solid #e2e8f0;border-radius:12px;padding:15px}
+.item h3{margin:0 0 10px}
+.meta{font-size:14px;color:#475569;line-height:1.8}
+button,.btn{display:inline-block;background:#087e65;color:white;padding:11px 15px;border:0;border-radius:8px;text-decoration:none;font-weight:bold;cursor:pointer}
+.empty{background:#f8fafc;padding:18px;border-radius:10px;color:#64748b}
+.contact{display:flex;gap:10px;flex-wrap:wrap}
+footer{text-align:center;padding:25px;color:#64748b;font-size:13px}
+a{color:#087e65}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap">
+<h1>AI SCRAP</h1>
+<p><strong>Chợ Phế Liệu Thông Minh</strong></p>
+<p>Kết nối mua bán phế liệu và chất thải tái chế trên toàn Việt Nam.</p>
+<p>废料智能交易市场 · 越南全国服务</p>
+<nav>
+<a href="index.html">Trang chủ</a>
+<a href="market.html">Chợ phế liệu</a>
+<a href="sell.html">Đăng bán</a>
+<a href="ai-sourcing.html">Tìm nguồn hàng AI</a>
+</nav>
+</div>
+</header>
+
+<main class="wrap">
+<section class="card">
+<h2 id="businessName">AI SCRAP</h2>
+<p id="tagline"><strong>Chợ Phế Liệu Thông Minh</strong></p>
+<p id="description" class="muted">Chợ mua bán phế liệu và chất thải trên toàn Việt Nam.</p>
+<p>📍 <strong>Khu vực phục vụ:</strong> <span id="serviceArea">Toàn quốc - Việt Nam</span></p>
+<div class="contact" id="contactLinks"></div>
+</section>
+
+<section class="card">
+<h2>Danh sách phế liệu đang bán</h2>
+<p class="muted">Các sản phẩm đang được người bán đăng trên AI SCRAP.</p>
+<div id="listings" class="grid">
+<div class="empty">Đang tải sản phẩm...</div>
+</div>
+</section>
+
+<section class="card">
+<h2>AI SCRAP – Tìm kiếm phế liệu tại Việt Nam</h2>
+<p class="muted">
+AI SCRAP kết nối người mua và người bán phế liệu.
+Tìm kiếm đồng, sắt, nhôm, nhựa, giấy và các vật liệu có thể tái chế.
+</p>
+<p class="muted">
+Từ khóa: thu mua phế liệu, bán phế liệu, chợ phế liệu, tái chế, phế liệu toàn quốc.
+</p>
+<a class="btn" href="market.html">Xem chợ phế liệu</a>
+</section>
+</main>
+
+<footer>© AI SCRAP – Chợ Phế Liệu Thông Minh</footer>
+
+<script>
+const SUPABASE_URL = "https://uddrsqankxnepjzgdatx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A";
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const OWNER_ID = "5118e0c8-c284-416d-8fe4-187db8934515";
+
+function esc(v){
+ return String(v ?? "").replace(/[&<>"']/g,c=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+function safeUrl(v){
+ try{
+  const u=new URL(v);
+  return ["https:","http:"].includes(u.protocol)?u.href:"";
+ }catch(e){return "";}
+}
+
+function contactLink(label,value){
+ if(!value)return "";
+ const url=safeUrl(value);
+ if(!url)return "";
+ return `<a class="btn" href="${esc(url)}" target="_blank" rel="noopener">${label}</a>`;
+}
+
+async function loadBusiness(){
+ const {data,error}=await db
+  .from("public_business_profiles")
+  .select("business_name,tagline,description,service_area,public_phone,public_zalo,public_facebook,public_tiktok")
+  .eq("slug","ai-scrap")
+  .eq("is_published",true)
+  .maybeSingle();
+
+ if(error)throw error;
+
+ if(data){
+  document.getElementById("businessName").textContent=data.business_name || "AI SCRAP";
+  document.getElementById("tagline").textContent=data.tagline || "Chợ Phế Liệu Thông Minh";
+  document.getElementById("description").textContent=data.description || "";
+  document.getElementById("serviceArea").textContent=data.service_area || "Toàn quốc - Việt Nam";
+
+  let links="";
+  if(data.public_phone){
+   const phone=String(data.public_phone).replace(/[^\d+]/g,"");
+   if(phone)links+=`<a class="btn" href="tel:${esc(phone)}">Gọi điện</a>`;
+  }
+  if(data.public_zalo){
+   const z=safeUrl(data.public_zalo);
+   if(z)links+=`<a class="btn" href="${esc(z)}" target="_blank" rel="noopener">Zalo</a>`;
+  }
+  links+=contactLink("Facebook",data.public_facebook);
+  links+=contactLink("TikTok",data.public_tiktok);
+  document.getElementById("contactLinks").innerHTML=links;
+ }
+}
+
+async function loadListings(){
+ const {data,error}=await db
+  .from("scrap_listings")
+  .select("id,title,category,material,description,quantity,unit,price,province,created_at")
+  .eq("seller_id",OWNER_ID)
+  .eq("status","active")
+  .order("created_at",{ascending:false})
+  .limit(50);
+
+ if(error)throw error;
+
+ const box=document.getElementById("listings");
+
+ if(!data || data.length===0){
+  box.innerHTML='<div class="empty">Chưa có sản phẩm đang bán. Vui lòng quay lại sau.</div>';
+  return;
+ }
+
+ box.innerHTML=data.map(x=>`
+  <article class="item">
+   <h3>${esc(x.title || x.material || "Phế liệu")}</h3>
+   <div class="meta">
+    Loại: ${esc(x.material || x.category || "Chưa cập nhật")}<br>
+    Số lượng: ${esc(x.quantity)} ${esc(x.unit || "")}<br>
+    Khu vực: ${esc(x.province || "Chưa cập nhật")}<br>
+    Giá: ${x.price==null || Number(x.price)===0 ? "Liên hệ" : esc(x.price)}
+   </div>
+   <p class="muted">${esc(x.description || "")}</p>
+   <a class="btn" href="market.html">Liên hệ người bán</a>
+  </article>
+ `).join("");
+}
+
+(async()=>{
+ try{
+  await loadBusiness();
+  await loadListings();
+ }catch(e){
+  console.error(e);
+  document.getElementById("listings").innerHTML=
+   '<div class="empty">Không thể tải dữ liệu. Vui lòng thử lại sau.</div>';
+ }
+})();
+</script>
+</body>
+</html>

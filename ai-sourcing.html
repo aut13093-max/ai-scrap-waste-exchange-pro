@@ -4,9 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI SCRAP - 智能找货与采购</title>
+<title>AI SCRAP WASTE PRO - 智能找货与采购</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 *{box-sizing:border-box}
 body{margin:0;padding:14px;background:#f1f5f9;color:#172033;font-family:Arial,"Noto Sans SC",sans-serif}
@@ -39,28 +38,23 @@ button:disabled{background:#94a3b8}
 @media(max-width:420px){body{padding:9px}.card{padding:14px}.tabs button{font-size:12px}}
 </style>
 </head>
-
 <body>
 <div class="wrap">
 
 <section class="card">
 <h1>AI SCRAP WASTE PRO</h1>
 <div class="sub">
-AI 智能找货与采购平台
-<br>
+AI 智能找货与采购平台<br>
 Tìm nguồn hàng và nhu cầu thu mua thông minh
 </div>
-
 <nav>
 <a href="index.html">首页 / Trang chủ</a>
 <a href="market.html">商品市场 / Chợ hàng</a>
 <a href="sell.html">发布商品 / Đăng bán</a>
 <a href="contacts.html">联系记录 / Liên hệ</a>
 </nav>
-
 <p class="sub">
-买家寻找货源，卖家寻找采购商，让供需双方更容易匹配。
-<br>
+买家寻找货源，卖家寻找采购商，让供需双方更容易匹配。<br>
 Kết nối người mua và người bán phế liệu.
 </p>
 </section>
@@ -73,10 +67,8 @@ Kết nối người mua và người bán phế liệu.
 </div>
 </section>
 
-<!-- 买家寻找卖家商品 -->
 <section class="card panel active" id="suppliers">
 <h2>寻找货源 / Tìm nguồn hàng</h2>
-
 <form id="supplierForm">
 <div class="grid">
 <div>
@@ -108,7 +100,6 @@ Kết nối người mua và người bán phế liệu.
 </div>
 <button class="submit" type="submit" id="supplierBtn">开始寻找货源 / Tìm nguồn hàng</button>
 </form>
-
 <p id="supplierStatus" class="small"></p>
 <p id="supplierError" class="error"></p>
 <div id="supplierResults">
@@ -116,11 +107,9 @@ Kết nối người mua và người bán phế liệu.
 </div>
 </section>
 
-<!-- 买家发布采购需求 -->
 <section class="card panel" id="publish">
 <h2>发布采购需求 / Đăng nhu cầu thu mua</h2>
 <p class="sub">填写你想采购的材料，让平台卖家看到你的需求。</p>
-
 <form id="requestForm">
 <div class="grid">
 <div>
@@ -153,22 +142,17 @@ Kết nối người mua và người bán phế liệu.
 <input id="rProvince" required placeholder="例如：胡志明市 / TP. Hồ Chí Minh">
 </div>
 </div>
-
 <label>采购说明 / Mô tả nhu cầu</label>
 <textarea id="rDescription" placeholder="材料质量、交货要求、联系方式说明等..."></textarea>
-
 <button class="submit" id="publishBtn" type="submit">发布采购需求 / Đăng nhu cầu</button>
 </form>
-
 <p id="publishStatus" class="small"></p>
 <p id="publishError" class="error"></p>
 </section>
 
-<!-- 卖家寻找买家需求 -->
 <section class="card panel" id="buyers">
 <h2>寻找采购商 / Tìm người mua</h2>
 <p class="sub">查看买家发布的有效采购需求，寻找潜在客户。</p>
-
 <form id="buyerSearchForm">
 <div class="grid">
 <div>
@@ -192,7 +176,6 @@ Kết nối người mua và người bán phế liệu.
 </div>
 <button class="submit" type="submit" id="buyerBtn">寻找采购商 / Tìm người mua</button>
 </form>
-
 <p id="buyerStatus" class="small"></p>
 <p id="buyerError" class="error"></p>
 <div id="buyerResults">
@@ -209,336 +192,382 @@ Kết nối người mua và người bán phế liệu.
 Phiên bản hiện tại sử dụng dữ liệu sản phẩm và nhu cầu thu mua để ghép nối. Điểm phù hợp chỉ mang tính tham khảo.
 </p>
 </section>
-
 </div>
 
 <script>
-const SUPABASE_URL = "https://uddrsqankxnepjzgdatx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A";
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL="https://uddrsqankxnepjzgdatx.supabase.co";
+const SUPABASE_KEY="sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-function norm(v) {
-  return String(v || "").toLocaleLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+/* 越南语标准化：处理 Đ、声调、大小写和多余空格 */
+function norm(v){
+  return String(v||"")
+    .toLocaleLowerCase()
+    .replace(/[đĐ]/g,"d")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
 }
 
-function esc(v) {
-  return String(v ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+/* 材料同义词库 */
+const MATERIAL_GROUPS={
+  copper:["dong","dong phe lieu","dong phe lieu loai 1","dong phe lieu loai 2","dong day","day dong","dong do","dong vang","dong cat"],
+  iron:["sat","sat phe lieu","sat vun","thep","thep phe lieu","gang"],
+  aluminum:["nhom","nhom phe lieu","nhom vun","nhom hop kim"],
+  plastic:["nhua","nhua phe lieu","nhua pet","pet","hdpe","pp","pvc","pe"],
+  paper:["giay","giay phe lieu","bia carton","carton"],
+  stainless:["inox","thep khong gi","sat khong gi"],
+  battery:["ac quy","binh ac quy","pin","pin phe lieu"],
+  electronic:["dien tu","rac dien tu","linh kien dien tu"]
+};
+
+function materialGroup(value){
+  const text=norm(value);
+  if(!text)return null;
+  for(const [group,aliases] of Object.entries(MATERIAL_GROUPS)){
+    if(aliases.some(alias=>text===alias||text.includes(alias)||alias.includes(text))){
+      return group;
+    }
+  }
+  return null;
+}
+
+function materialMatches(keyword,item){
+  const wanted=norm(keyword);
+  if(!wanted)return true;
+
+  const itemText=norm([
+    item.title,item.material,item.category,item.description
+  ].join(" "));
+
+  if(itemText.includes(wanted))return true;
+
+  const wantedGroup=materialGroup(wanted);
+  if(!wantedGroup)return false;
+
+  const itemValues=[
+    item.title,item.material,item.category,item.description
+  ].map(norm);
+
+  return itemValues.some(value=>{
+    if(!value)return false;
+    if(materialGroup(value)===wantedGroup)return true;
+    return Object.entries(MATERIAL_GROUPS)
+      .filter(([group])=>group===wantedGroup)
+      .some(([,aliases])=>aliases.some(alias=>value.includes(alias)));
+  });
+}
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   }[c]));
 }
 
-async function currentUser() {
-  const {data, error} = await db.auth.getUser();
-  if (error) throw error;
+async function currentUser(){
+  const {data,error}=await db.auth.getUser();
+  if(error)throw error;
   return data.user;
 }
 
-function matchingScore(item, keyword, province, quantity, maxPrice) {
-  let score = 0;
-  const text = norm([
-    item.title, item.material, item.category, item.description
-  ].join(" "));
+function matchingScore(item,keyword,province,quantity,maxPrice,unit){
+  let score=0;
 
-  const words = norm(keyword).split(/\s+/).filter(Boolean);
-
-  if (words.length) {
-    const hits = words.filter(w => text.includes(w)).length;
-    score += Math.round(45 * hits / words.length);
-  } else {
-    score += 20;
+  if(keyword){
+    if(materialMatches(keyword,item))score+=45;
+    else return 0;
+  }else{
+    score+=20;
   }
 
-  const p = norm(item.province);
-  const wanted = norm(province);
+  const p=norm(item.province);
+  const wanted=norm(province);
 
-  if (wanted) {
-    if (p === wanted) score += 30;
-    else if (p.includes(wanted) || wanted.includes(p)) score += 20;
-  } else {
-    score += 10;
+  if(wanted){
+    if(p===wanted)score+=30;
+    else if(p.includes(wanted)||wanted.includes(p))score+=20;
+  }else{
+    score+=10;
   }
 
-  const available = Number(item.quantity) || 0;
-  if (quantity > 0) {
-    if (available >= quantity) score += 25;
-    else if (available > 0) score += Math.round(15 * available / quantity);
-  } else {
-    score += 15;
+  const available=Number(item.quantity)||0;
+  if(quantity>0){
+    if(available>=quantity)score+=25;
+    else if(available>0)score+=Math.round(15*available/quantity);
+  }else{
+    score+=15;
   }
 
-  if (maxPrice > 0 && item.price != null && Number(item.price) > 0) {
-    if (Number(item.price) <= maxPrice) score += 10;
-  } else {
-    score += 10;
+  if(unit){
+    if(norm(item.unit)===norm(unit))score+=10;
+  }else{
+    score+=5;
   }
 
-  return Math.min(score, 100);
+  if(maxPrice>0){
+    if(item.price!=null&&Number(item.price)>0&&Number(item.price)<=maxPrice)score+=10;
+  }else{
+    score+=5;
+  }
+
+  return Math.min(score,100);
 }
 
-function showPanel(id) {
-  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll("[data-tab]").forEach(b => b.classList.remove("active"));
+function showPanel(id){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll("[data-tab]").forEach(b=>b.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   document.querySelector(`[data-tab="${id}"]`).classList.add("active");
 }
 
-document.querySelectorAll("[data-tab]").forEach(button => {
-  button.addEventListener("click", () => showPanel(button.dataset.tab));
+document.querySelectorAll("[data-tab]").forEach(button=>{
+  button.addEventListener("click",()=>showPanel(button.dataset.tab));
 });
 
-// =====================================
-// 1. BUYER SEARCHES SELLER LISTINGS
-// =====================================
-
-document.getElementById("supplierForm").addEventListener("submit", async e => {
+/* 1. 买家寻找卖家商品 */
+document.getElementById("supplierForm").addEventListener("submit",async e=>{
   e.preventDefault();
 
-  const btn = document.getElementById("supplierBtn");
-  const output = document.getElementById("supplierResults");
-  const status = document.getElementById("supplierStatus");
-  const errorBox = document.getElementById("supplierError");
+  const btn=document.getElementById("supplierBtn");
+  const output=document.getElementById("supplierResults");
+  const status=document.getElementById("supplierStatus");
+  const errorBox=document.getElementById("supplierError");
 
-  btn.disabled = true;
-  status.textContent = "正在搜索商品... / Đang tìm kiếm...";
-  errorBox.textContent = "";
-  output.innerHTML = "";
+  btn.disabled=true;
+  status.textContent="正在搜索商品... / Đang tìm kiếm...";
+  errorBox.textContent="";
+  output.innerHTML="";
 
-  const keyword = document.getElementById("sKeyword").value.trim();
-  const province = document.getElementById("sProvince").value.trim();
-  const quantity = Number(document.getElementById("sQuantity").value) || 0;
-  const unit = document.getElementById("sUnit").value;
-  const maxPrice = Number(document.getElementById("sPrice").value) || 0;
+  const keyword=document.getElementById("sKeyword").value.trim();
+  const province=document.getElementById("sProvince").value.trim();
+  const quantity=Number(document.getElementById("sQuantity").value)||0;
+  const unit=document.getElementById("sUnit").value;
+  const maxPrice=Number(document.getElementById("sPrice").value)||0;
 
-  try {
-    let query = db.from("scrap_listings")
+  try{
+    let query=db.from("scrap_listings")
       .select("id,seller_id,title,category,material,description,quantity,unit,price,province,status,created_at")
-      .eq("status", "active")
-      .order("created_at", {ascending:false})
+      .eq("status","active")
+      .order("created_at",{ascending:false})
       .limit(100);
 
-    if (unit) query = query.eq("unit", unit);
+    if(unit)query=query.eq("unit",unit);
 
-    const {data, error} = await query;
-    if (error) throw error;
+    const {data,error}=await query;
+    if(error)throw error;
 
-    const items = (data || [])
-      .map(item => ({
+    const items=(data||[])
+      .map(item=>({
         item,
-        score: matchingScore(item, keyword, province, quantity, maxPrice)
+        score:matchingScore(item,keyword,province,quantity,maxPrice,unit)
       }))
-      .filter(row => {
-        if (keyword && row.score < 15) return false;
-        if (province && !norm(row.item.province).includes(norm(province))) return false;
-        if (quantity > 0 && Number(row.item.quantity) <= 0) return false;
-        if (maxPrice > 0 && row.item.price != null &&
-            Number(row.item.price) > maxPrice) return false;
+      .filter(row=>{
+        if(keyword&&!materialMatches(keyword,row.item))return false;
+        if(province&&!norm(row.item.province).includes(norm(province)))return false;
+        if(quantity>0&&Number(row.item.quantity)<=0)return false;
+        if(maxPrice>0&&row.item.price!=null&&Number(row.item.price)>maxPrice)return false;
         return true;
       })
-      .sort((a,b) => b.score - a.score);
+      .sort((a,b)=>b.score-a.score);
 
-    if (!items.length) {
-      output.innerHTML = `<div class="empty">没有找到匹配商品。/ Không tìm thấy sản phẩm phù hợp.</div>`;
-    } else {
-      output.innerHTML = items.map(({item,score}) => `
+    if(!items.length){
+      output.innerHTML='<div class="empty">没有找到匹配商品。请尝试输入更短的材料关键词，或检查商品资料。<br>Không tìm thấy sản phẩm phù hợp.</div>';
+    }else{
+      output.innerHTML=items.map(({item,score})=>`
         <article class="result">
           <div class="row">
-            <strong>${esc(item.title || item.material || "未命名商品")}</strong>
+            <strong>${esc(item.title||item.material||"未命名商品")}</strong>
             <span class="score">匹配度 ${score}%</span>
           </div>
           <div class="meta">
-            材料：${esc(item.material || item.category || "未注明")}<br>
-            数量：${esc(item.quantity)} ${esc(item.unit || "")}<br>
-            地区：${esc(item.province || "未注明")}<br>
-            价格：${item.price == null ? "联系卖家" : esc(item.price)}
+            材料：${esc(item.material||item.category||"未注明")}<br>
+            数量：${esc(item.quantity)} ${esc(item.unit||"")}<br>
+            地区：${esc(item.province||"未注明")}<br>
+            价格：${item.price==null?"联系卖家":esc(item.price)}
           </div>
-          <p>${esc(item.description || "")}</p>
+          <p>${esc(item.description||"暂无描述")}</p>
           <button type="button" data-listing="${esc(item.id)}">联系卖家 / Liên hệ người bán</button>
         </article>
       `).join("");
 
-      output.querySelectorAll("[data-listing]").forEach(button => {
-        button.addEventListener("click", () => contactSeller(button.dataset.listing));
+      output.querySelectorAll("[data-listing]").forEach(button=>{
+        button.addEventListener("click",()=>contactSeller(button.dataset.listing));
       });
     }
 
-    status.textContent = `搜索完成：检查 ${data?.length || 0} 条商品。`;
-  } catch (err) {
-    errorBox.textContent = "搜索失败：" + err.message;
-  } finally {
-    btn.disabled = false;
+    status.textContent=`搜索完成：检查 ${data?.length||0} 条商品。`;
+  }catch(err){
+    errorBox.textContent="搜索失败："+err.message;
+  }finally{
+    btn.disabled=false;
   }
 });
 
-async function contactSeller(listingId) {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      location.href = "login.html?redirect=ai-sourcing.html";
+async function contactSeller(listingId){
+  try{
+    const user=await currentUser();
+    if(!user){
+      location.href="login.html?redirect=ai-sourcing.html";
       return;
     }
 
-    const {data: listing, error} = await db.from("scrap_listings")
+    const {data:listing,error}=await db.from("scrap_listings")
       .select("id,seller_id,title")
-      .eq("id", listingId)
+      .eq("id",listingId)
       .single();
 
-    if (error) throw error;
-
-    if (listing.seller_id === user.id) {
+    if(error)throw error;
+    if(listing.seller_id===user.id){
       alert("这是你自己发布的商品。");
       return;
     }
 
-    const message = prompt("请输入采购询问内容：", "我对这个商品有采购意向，请联系我。");
-    if (!message || !message.trim()) return;
+    const message=prompt("请输入采购询问内容：","我对这个商品有采购意向，请联系我。");
+    if(!message||!message.trim())return;
 
-    const {error: insertError} = await db.from("trade_contacts").insert({
-      listing_id: listing.id,
-      buyer_id: user.id,
-      seller_id: listing.seller_id,
-      message: message.trim(),
-      status: "pending"
+    const {error:insertError}=await db.from("trade_contacts").insert({
+      listing_id:listing.id,
+      buyer_id:user.id,
+      seller_id:listing.seller_id,
+      message:message.trim(),
+      status:"pending"
     });
 
-    if (insertError) throw insertError;
+    if(insertError)throw insertError;
     alert("采购询问已发送。");
-  } catch (err) {
-    alert("操作失败：" + err.message);
+  }catch(err){
+    alert("操作失败："+err.message);
   }
 }
 
-// =====================================
-// 2. BUYER PUBLISHES A BUY REQUEST
-// =====================================
-
-document.getElementById("requestForm").addEventListener("submit", async e => {
+/* 2. 买家发布采购需求 */
+document.getElementById("requestForm").addEventListener("submit",async e=>{
   e.preventDefault();
 
-  const btn = document.getElementById("publishBtn");
-  const status = document.getElementById("publishStatus");
-  const errorBox = document.getElementById("publishError");
+  const btn=document.getElementById("publishBtn");
+  const status=document.getElementById("publishStatus");
+  const errorBox=document.getElementById("publishError");
 
-  btn.disabled = true;
-  status.textContent = "正在发布采购需求...";
-  errorBox.textContent = "";
+  btn.disabled=true;
+  status.textContent="正在发布采购需求...";
+  errorBox.textContent="";
 
-  try {
-    const user = await currentUser();
-
-    if (!user) {
-      location.href = "login.html?redirect=ai-sourcing.html";
+  try{
+    const user=await currentUser();
+    if(!user){
+      location.href="login.html?redirect=ai-sourcing.html";
       return;
     }
 
-    const material = document.getElementById("rMaterial").value.trim();
-    const category = document.getElementById("rCategory").value.trim();
-    const quantity = Number(document.getElementById("rQuantity").value);
-    const unit = document.getElementById("rUnit").value;
-    const targetPrice = document.getElementById("rPrice").value;
-    const province = document.getElementById("rProvince").value.trim();
-    const description = document.getElementById("rDescription").value.trim();
+    const material=document.getElementById("rMaterial").value.trim();
+    const category=document.getElementById("rCategory").value.trim();
+    const quantity=Number(document.getElementById("rQuantity").value);
+    const unit=document.getElementById("rUnit").value;
+    const targetPrice=document.getElementById("rPrice").value;
+    const province=document.getElementById("rProvince").value.trim();
+    const description=document.getElementById("rDescription").value.trim();
 
-    if (!material || !province || !quantity || quantity <= 0) {
+    if(!material||!province||!quantity||quantity<=0){
       throw new Error("请填写材料、有效数量和省市。");
     }
 
-    const request = {
-      buyer_id: user.id,
+    const request={
+      buyer_id:user.id,
       material,
-      category: category || null,
+      category:category||null,
       quantity,
       unit,
-      target_price: targetPrice === "" ? null : Number(targetPrice),
+      target_price:targetPrice===""?null:Number(targetPrice),
       province,
-      description: description || null,
-      status: "active"
+      description:description||null,
+      status:"active"
     };
 
-    const {error} = await db.from("buyer_requests").insert(request);
-    if (error) throw error;
+    const {error}=await db.from("buyer_requests").insert(request);
+    if(error)throw error;
 
-    status.textContent = "采购需求发布成功！/ Đăng nhu cầu thành công!";
-    status.className = "small success";
+    status.textContent="采购需求发布成功！/ Đăng nhu cầu thành công!";
+    status.className="small success";
     document.getElementById("requestForm").reset();
-
-  } catch (err) {
-    errorBox.textContent = "发布失败：" + err.message;
-  } finally {
-    btn.disabled = false;
+  }catch(err){
+    errorBox.textContent="发布失败："+err.message;
+  }finally{
+    btn.disabled=false;
   }
 });
 
-// =====================================
-// 3. SELLER SEARCHES BUYER REQUESTS
-// =====================================
-
-document.getElementById("buyerSearchForm").addEventListener("submit", async e => {
+/* 3. 卖家寻找买家需求 */
+document.getElementById("buyerSearchForm").addEventListener("submit",async e=>{
   e.preventDefault();
 
-  const btn = document.getElementById("buyerBtn");
-  const output = document.getElementById("buyerResults");
-  const status = document.getElementById("buyerStatus");
-  const errorBox = document.getElementById("buyerError");
+  const btn=document.getElementById("buyerBtn");
+  const output=document.getElementById("buyerResults");
+  const status=document.getElementById("buyerStatus");
+  const errorBox=document.getElementById("buyerError");
 
-  btn.disabled = true;
-  status.textContent = "正在寻找采购需求...";
-  errorBox.textContent = "";
-  output.innerHTML = "";
+  btn.disabled=true;
+  status.textContent="正在寻找采购需求...";
+  errorBox.textContent="";
+  output.innerHTML="";
 
-  const keyword = norm(document.getElementById("bKeyword").value);
-  const province = norm(document.getElementById("bProvince").value);
-  const unit = document.getElementById("bUnit").value;
+  const keyword=document.getElementById("bKeyword").value.trim();
+  const province=norm(document.getElementById("bProvince").value);
+  const unit=document.getElementById("bUnit").value;
 
-  try {
-    let query = db.from("buyer_requests")
+  try{
+    let query=db.from("buyer_requests")
       .select("id,buyer_id,material,category,quantity,unit,target_price,province,description,status,created_at")
-      .eq("status", "active")
-      .order("created_at", {ascending:false})
+      .eq("status","active")
+      .order("created_at",{ascending:false})
       .limit(100);
 
-    if (unit) query = query.eq("unit", unit);
+    if(unit)query=query.eq("unit",unit);
 
-    const {data, error} = await query;
-    if (error) throw error;
+    const {data,error}=await query;
+    if(error)throw error;
 
-    const filtered = (data || []).filter(item => {
-      const text = norm([item.material,item.category,item.description].join(" "));
-      if (keyword && !text.includes(keyword)) return false;
-      if (province && !norm(item.province).includes(province)) return false;
+    const filtered=(data||[]).filter(item=>{
+      const itemText=[item.material,item.category,item.description].join(" ");
+      if(keyword&&!materialMatches(keyword,{
+        title:item.material,
+        material:item.material,
+        category:item.category,
+        description:item.description
+      }))return false;
+      if(province&&!norm(item.province).includes(province))return false;
       return true;
     });
 
-    if (!filtered.length) {
-      output.innerHTML = `<div class="empty">目前没有找到符合条件的采购需求。/ Chưa tìm thấy nhu cầu phù hợp.</div>`;
-    } else {
-      output.innerHTML = filtered.map(item => `
+    if(!filtered.length){
+      output.innerHTML='<div class="empty">目前没有找到符合条件的采购需求。<br>Chưa tìm thấy nhu cầu phù hợp.</div>';
+    }else{
+      output.innerHTML=filtered.map(item=>`
         <article class="result">
           <div class="row">
-            <strong>${esc(item.material || "未注明材料")}</strong>
+            <strong>${esc(item.material||"未注明材料")}</strong>
             <span class="score">有效需求 / Đang cần mua</span>
           </div>
           <div class="meta">
-            类别：${esc(item.category || "未注明")}<br>
-            采购数量：${esc(item.quantity)} ${esc(item.unit || "")}<br>
-            目标单价：${item.target_price == null ? "面议 / Thỏa thuận" : esc(item.target_price)}<br>
-            地区：${esc(item.province || "未注明")}<br>
+            类别：${esc(item.category||"未注明")}<br>
+            采购数量：${esc(item.quantity)} ${esc(item.unit||"")}<br>
+            目标单价：${item.target_price==null?"面议 / Thỏa thuận":esc(item.target_price)}<br>
+            地区：${esc(item.province||"未注明")}<br>
             需求编号：${esc(item.id)}
           </div>
-          <p>${esc(item.description || "")}</p>
+          <p>${esc(item.description||"")}</p>
           <p class="small">买家账号编号：${esc(item.buyer_id)}</p>
         </article>
       `).join("");
     }
 
-    status.textContent = `找到 ${filtered.length} 条有效采购需求。`;
-  } catch (err) {
-    errorBox.textContent = "读取采购需求失败：" + err.message;
-  } finally {
-    btn.disabled = false;
+    status.textContent=`找到 ${filtered.length} 条有效采购需求。`;
+  }catch(err){
+    errorBox.textContent="读取采购需求失败："+err.message;
+  }finally{
+    btn.disabled=false;
   }
 });
 </script>
-
 </body>
 </html>

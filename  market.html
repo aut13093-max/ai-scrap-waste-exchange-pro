@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chợ phế liệu - AI SCRAP WASTE PRO</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f6f4;color:#222}
+header{background:#176b43;color:white;padding:20px 16px}
+header h2{margin:0 0 8px}
+header p{margin:0;font-size:14px}
+.container{max-width:1000px;margin:auto;padding:16px}
+.search{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+input,select{padding:13px;border:1px solid #ccc;border-radius:8px;font-size:15px;background:white}
+input{flex:1;min-width:180px}
+select{min-width:140px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px #0001}
+.card h3{margin:0 0 10px;color:#176b43}
+.price{font-size:20px;font-weight:bold;color:#d66a16;margin:12px 0}
+.info{font-size:14px;line-height:1.7;color:#555}
+.tag{display:inline-block;background:#e8f4ec;color:#176b43;padding:5px 9px;border-radius:20px;font-size:12px}
+.empty{background:white;padding:22px;border-radius:10px;text-align:center}
+.links{margin:18px 0;display:flex;gap:18px;flex-wrap:wrap}
+a{color:#176b43}
+</style>
+</head>
+<body>
+<header>
+<h2>AI SCRAP WASTE PRO</h2>
+<p>Chợ mua bán phế liệu và chất thải</p>
+</header>
+
+<div class="container">
+<h3>Danh sách sản phẩm đang bán</h3>
+
+<div class="search">
+<input id="search" type="search" placeholder="Tìm tên sản phẩm, vật liệu...">
+<select id="category">
+<option value="">Tất cả danh mục</option>
+<option value="Kim loại">Kim loại</option>
+<option value="Nhựa">Nhựa</option>
+<option value="Giấy">Giấy</option>
+<option value="Điện tử">Điện tử</option>
+<option value="Khác">Khác</option>
+</select>
+</div>
+
+<p id="count">Đang tải sản phẩm...</p>
+<div id="products" class="grid"></div>
+
+<div class="links">
+<a href="sell.html">＋ Đăng bán sản phẩm</a>
+<a href="index.html">Trang chủ</a>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const db = window.supabase.createClient(
+  "https://uddrsqankxnepjzgdatx.supabase.co",
+  "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A"
+);
+
+const products = document.getElementById("products");
+const count = document.getElementById("count");
+const search = document.getElementById("search");
+const category = document.getElementById("category");
+
+let allItems = [];
+
+function safe(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+
+function money(value) {
+  if (value === null || value === undefined || value === "") {
+    return "Liên hệ";
+  }
+  return Number(value).toLocaleString("vi-VN") + " VND";
+}
+
+function render() {
+  const keyword = search.value.trim().toLowerCase();
+  const selected = category.value;
+
+  const filtered = allItems.filter(item => {
+    const text = [
+      item.title, item.material, item.description,
+      item.province, item.category
+    ].join(" ").toLowerCase();
+
+    return text.includes(keyword) &&
+      (!selected || item.category === selected);
+  });
+
+  count.textContent = "Tìm thấy " + filtered.length + " sản phẩm";
+
+  if (!filtered.length) {
+    products.innerHTML =
+      '<div class="empty">Chưa tìm thấy sản phẩm phù hợp.</div>';
+    return;
+  }
+
+  products.innerHTML = filtered.map(item => `
+    <article class="card">
+      <span class="tag">${safe(item.category || "Khác")}</span>
+      <h3>${safe(item.title)}</h3>
+      <div class="info">
+        <b>Vật liệu:</b> ${safe(item.material || "Chưa cập nhật")}<br>
+        <b>Số lượng:</b> ${safe(item.quantity)} ${safe(item.unit)}<br>
+        <b>Khu vực:</b> ${safe(item.province || "Chưa cập nhật")}
+      </div>
+      <div class="price">${money(item.price)}</div>
+      <div class="info">${safe(item.description || "Chưa có mô tả")}</div>
+    </article>
+  `).join("");
+}
+
+async function loadProducts() {
+  count.textContent = "Đang tải sản phẩm...";
+
+  const { data, error } = await db
+    .from("scrap_listings")
+    .select("id,title,category,material,description,quantity,unit,price,province,created_at")
+    .eq("status", "active")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    count.textContent = "Lỗi tải sản phẩm: " + error.message;
+    return;
+  }
+
+  allItems = data || [];
+  render();
+}
+
+search.addEventListener("input", render);
+category.addEventListener("change", render);
+loadProducts();
+</script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI SCRAP - Phone Registration</title>
+<title>AI SCRAP - Registration</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
@@ -30,6 +30,7 @@ button:disabled{background:#94a3b8}
 <div id="connectionStatus" class="status">正在检查 Supabase 连接...</div>
 
 <form id="registerForm">
+
 <label>Loại tài khoản - 账户类型</label>
 <select id="role" required>
 <option value="seller">Người bán - 卖家</option>
@@ -43,10 +44,14 @@ button:disabled{background:#94a3b8}
 <label>Tên công ty - 公司名称</label>
 <input id="company_name" maxlength="150" placeholder="Tên công ty (nếu có)">
 
+<label>Email - 邮箱</label>
+<input id="email" type="email" required maxlength="254"
+placeholder="example@gmail.com" autocomplete="email">
+
 <label>Số điện thoại - 越南手机号</label>
-<input id="phone" type="tel" required maxlength="20"
+<input id="phone" type="tel" maxlength="20"
 placeholder="0984876505" autocomplete="tel">
-<div class="hint">Ví dụ: 0984876505 hoặc +84984876505</div>
+<div class="hint">Không bắt buộc - 非必填</div>
 
 <label>Tỉnh / Thành phố - 省市</label>
 <input id="province" required maxlength="100"
@@ -79,28 +84,6 @@ function showMessage(text, color) {
   message.style.color = color;
 }
 
-function normalizeVietnamPhone(value) {
-  let phone = value.trim().replace(/[\s().-]/g, "");
-
-  if (phone.startsWith("+84")) {
-    phone = phone;
-  } else if (phone.startsWith("0084")) {
-    phone = "+" + phone.slice(2);
-  } else if (phone.startsWith("84")) {
-    phone = "+" + phone;
-  } else if (phone.startsWith("0")) {
-    phone = "+84" + phone.slice(1);
-  } else {
-    throw new Error("请填写有效的越南手机号，例如 0984876505。");
-  }
-
-  if (!/^\+84[0-9]{9,10}$/.test(phone)) {
-    throw new Error("越南手机号格式不正确，请检查号码。");
-  }
-
-  return phone;
-}
-
 async function checkConnection() {
   try {
     if (!window.supabase) {
@@ -123,6 +106,7 @@ async function checkConnection() {
 
     statusBox.textContent = "✓ Supabase 连接正常，可以注册。";
     statusBox.style.color = "green";
+
   } catch (error) {
     statusBox.textContent = "连接失败：" + error.message;
     statusBox.style.color = "red";
@@ -149,42 +133,37 @@ form.addEventListener("submit", async function(event) {
   button.textContent = "Đang xử lý...";
 
   try {
-    const phone = normalizeVietnamPhone(
-      document.getElementById("phone").value
-    );
-
+    const email = document.getElementById("email").value.trim().toLowerCase();
     const password = document.getElementById("password").value;
 
     const metadata = {
       role: document.getElementById("role").value,
       full_name: document.getElementById("full_name").value.trim(),
       company_name: document.getElementById("company_name").value.trim(),
-      phone: phone,
+      phone: document.getElementById("phone").value.trim(),
       province: document.getElementById("province").value.trim()
     };
 
     const { data, error } = await db.auth.signUp({
-      phone: phone,
+      email: email,
       password: password,
       options: {
-        data: metadata
+        data: metadata,
+        emailRedirectTo: location.origin + "/market.html"
       }
     });
 
     if (error) throw error;
 
     if (data.session) {
-      showMessage(
-        "注册成功！账户已建立，可以继续使用平台。",
-        "green"
-      );
+      showMessage("注册成功！正在进入市场...", "green");
 
       setTimeout(() => {
         location.href = "market.html";
       }, 1200);
     } else {
       showMessage(
-        "注册申请已提交，但尚未取得登录会话。请检查 Supabase 手机号确认设置。",
+        "注册申请已提交。请打开邮箱，点击验证链接后再登录。",
         "#b45309"
       );
     }

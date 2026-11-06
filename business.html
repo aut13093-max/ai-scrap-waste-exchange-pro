@@ -59,7 +59,6 @@ footer{text-align:center;padding:25px;color:#64748b;font-size:13px}
 a{color:#087e65}
 .item-actions{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
 .item-actions .btn{margin:0}
-.btn-zalo{background:#0068ff}
 </style>
 </head>
 
@@ -97,14 +96,8 @@ Chợ mua bán phế liệu và chất thải trên toàn Việt Nam.
 </p>
 
 <div class="contact" id="contactLinks">
-<a class="btn btn-zalo"
- href="https://zalo.me/0984876505"
- target="_blank" rel="noopener noreferrer">
- Liên hệ qua Zalo
-</a>
-
 <a class="btn btn-phone" href="tel:0984876505">
-Gọi điện ngay
+Gọi điện ngay: 0984876505
 </a>
 </div>
 </section>
@@ -155,9 +148,6 @@ const OWNER_ID =
 
 const DEFAULT_PHONE = "0984876505";
 
-/* 所有 Zalo 按钮统一进入这个账号的个人主页 */
-const DEFAULT_ZALO = "https://zalo.me/0984876505";
-
 function esc(v){
  return String(v ?? "").replace(/[&<>"']/g,c=>({
   "&":"&amp;",
@@ -187,15 +177,6 @@ function contactLink(label,value){
  href="${esc(url)}"
  target="_blank"
  rel="noopener noreferrer">${label}</a>`;
-}
-
-function zaloButton(){
- return `<a class="btn btn-zalo"
- href="${DEFAULT_ZALO}"
- target="_blank"
- rel="noopener noreferrer">
- Liên hệ qua Zalo
- </a>`;
 }
 
 async function loadBusiness(){
@@ -228,12 +209,10 @@ async function loadBusiness(){
   phone=String(data.public_phone || DEFAULT_PHONE)
    .replace(/[^\d+]/g,"");
 
-  let links=zaloButton();
-
-  links+=`
+  let links=`
    <a class="btn btn-phone"
    href="tel:${esc(phone)}">
-   Gọi điện ngay
+   Gọi điện ngay: ${esc(phone)}
    </a>
   `;
 
@@ -284,15 +263,12 @@ async function loadListings(){
    <p class="muted">${esc(x.description || "")}</p>
 
    <div class="item-actions">
-
-    ${zaloButton()}
-
     <a class="btn btn-phone"
     href="tel:${DEFAULT_PHONE}">
-    Gọi điện ngay
+    Gọi điện: ${DEFAULT_PHONE}
     </a>
-
    </div>
+
   </article>
 
  `).join("");

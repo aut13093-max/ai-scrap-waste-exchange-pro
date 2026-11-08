@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#123f32">
+<title>AI SCRAP - National Price Board</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f6f3;color:#18332b;font-family:Arial,sans-serif}
+header{background:#123f32;color:white;padding:20px 15px}
+header h1{font-size:21px;margin:0 0 7px}
+header p{font-size:13px;color:#d5e8df;margin:0}
+main{max-width:1000px;margin:auto;padding:14px}
+.panel{background:white;border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:0 2px 8px #0000000c}
+h2{font-size:18px;margin:5px 0 14px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button,.btn{border:0;border-radius:8px;padding:12px;background:#16734f;color:white;font-size:14px;cursor:pointer}
+.tabs button{background:#e2ebe5;color:#18332b}
+.tabs button.active{background:#16734f;color:white}
+input,select{width:100%;padding:11px;border:1px solid #ccd8d2;border-radius:8px;font-size:14px;background:white}
+label{font-size:13px;font-weight:bold;display:block;margin:10px 0 5px}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:650px;font-size:13px}
+th,td{padding:11px 9px;border-bottom:1px solid #e5ebe6;text-align:left;white-space:nowrap}
+th{background:#edf3ef}
+td strong{color:#16734f}
+.up{color:#16834f}.down{color:#bd3434}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.formgrid .full{grid-column:1/-1}
+.action{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.action button{flex:1}
+.small{font-size:12px;color:#718078;line-height:1.6}
+.hidden{display:none}
+.badge{padding:4px 7px;border-radius:5px;background:#edf3ef;font-size:11px}
+footer{text-align:center;padding:20px;color:#718078;font-size:12px}
+@media(max-width:480px){.formgrid,.filters{grid-template-columns:1fr}.tabs{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>AI SCRAP - NATIONAL PRICE BOARD</h1>
+<p>BẢNG GIÁ PHẾ LIỆU TOÀN QUỐC - VIỆT NAM</p>
+</header>
+<main>
+<div class="panel">
+<h2>Trung tâm báo giá</h2>
+<div class="tabs">
+<button class="active" onclick="showTab('market',this)">Giá tham khảo</button>
+<button onclick="showTab('buyers',this)">Giá người mua</button>
+<button onclick="showTab('sellers',this)">Giá người bán</button>
+<button onclick="showTab('spread',this)">So sánh chênh lệch</button>
+</div>
+</div>
+
+<section id="market" class="panel">
+<h2>Giá phế liệu tham khảo toàn quốc</h2>
+<p class="small">Đơn vị: VND/kg. Giá khởi tạo do quản trị viên nhập, chưa xác nhận là giá giao dịch hôm nay.</p>
+<div class="filters">
+<input id="marketSearch" placeholder="Tìm loại phế liệu..." oninput="renderAll()">
+<select id="marketSort" onchange="renderAll()">
+<option value="name">Sắp xếp tên</option>
+<option value="low">Giá thấp đến cao</option>
+<option value="high">Giá cao đến thấp</option>
+</select>
+</div>
+<div class="table-wrap">
+<table><thead><tr><th>Vật liệu</th><th>Giá thấp</th><th>Giá cao</th><th>Cập nhật</th><th>Nguồn</th></tr></thead>
+<tbody id="marketRows"></tbody></table>
+</div>
+</section>
+
+<section id="buyers" class="panel hidden">
+<h2>Bảng báo giá người mua</h2>
+<div class="filters">
+<input id="buyerSearch" placeholder="Tìm vật liệu hoặc người mua..." oninput="renderAll()">
+<select id="buyerRegion" onchange="renderAll()">
+<option value="">Tất cả khu vực</option>
+<option>Hồ Chí Minh</option><option>Bình Dương</option><option>Đồng Nai</option>
+<option>Long An</option><option>Hà Nội</option><option>Đà Nẵng</option><option>Khác</option>
+</select>
+</div>
+<div class="table-wrap"><table><thead><tr><th>Người mua</th><th>Khu vực</th><th>Vật liệu</th><th>Giá mua/kg</th><th>Số lượng kg</th><th>Cập nhật</th></tr></thead><tbody id="buyerRows"></tbody></table></div>
+</section>
+
+<section id="sellers" class="panel hidden">
+<h2>Bảng báo giá người bán</h2>
+<div class="filters">
+<input id="sellerSearch" placeholder="Tìm vật liệu hoặc người bán..." oninput="renderAll()">
+<select id="sellerRegion" onchange="renderAll()">
+<option value="">Tất cả khu vực</option>
+<option>Hồ Chí Minh</option><option>Bình Dương</option><option>Đồng Nai</option>
+<option>Long An</option><option>Hà Nội</option><option>Đà Nẵng</option><option>Khác</option>
+</select>
+</div>
+<div class="table-wrap"><table><thead><tr><th>Người bán</th><th>Khu vực</th><th>Vật liệu</th><th>Giá bán/kg</th><th>Số lượng kg</th><th>Cập nhật</th></tr></thead><tbody id="sellerRows"></tbody></table></div>
+</section>
+
+<section id="spread" class="panel hidden">
+<h2>Bảng so sánh chênh lệch mua bán</h2>
+<p class="small">Chênh lệch = giá mua cao nhất - giá bán thấp nhất. Chưa trừ vận chuyển, hao hụt, kiểm định và chi phí khác.</p>
+<div class="table-wrap"><table><thead><tr><th>Vật liệu</th><th>Giá bán thấp nhất</th><th>Giá mua cao nhất</th><th>Chênh lệch/kg</th><th>Trạng thái</th></tr></thead><tbody id="spreadRows"></tbody></table></div>
+</section>
+
+<section class="panel">
+<h2>Thêm báo giá mới</h2>
+<p class="small">Nhập báo giá người mua hoặc người bán. Thông tin được lưu trong trình duyệt thiết bị này.</p>
+<div class="formgrid">
+<div><label>Loại báo giá</label><select id="quoteType"><option value="buyer">Người mua - thu mua</option><option value="seller">Người bán - chào bán</option></select></div>
+<div><label>Tên người mua / người bán</label><input id="quoteName" placeholder="Tên thương nhân"></div>
+<div><label>Khu vực</label><select id="quoteRegion"><option>Hồ Chí Minh</option><option>Bình Dương</option><option>Đồng Nai</option><option>Long An</option><option>Hà Nội</option><option>Đà Nẵng</option><option>Khác</option></select></div>
+<div><label>Vật liệu</label><input id="quoteMaterial" placeholder="Ví dụ: Đồng đỏ"></div>
+<div><label>Giá VND/kg</label><input id="quotePrice" type="number" min="1" placeholder="Giá báo"></div>
+<div><label>Số lượng kg</label><input id="quoteQty" type="number" min="0" placeholder="Khối lượng"></div>
+<div class="full"><label>Nguồn / ghi chú / điều kiện hàng</label><input id="quoteNote" placeholder="Ví dụ: Hàng sạch, đã kiểm tra, báo giá qua điện thoại"></div>
+</div>
+<div class="action">
+<button onclick="addQuote()">LƯU BÁO GIÁ</button>
+<button onclick="exportCSV()">XUẤT CSV</button>
+</div>
+<p class="small">Chỉ nhập thông tin liên hệ khi đã được phép công khai. Báo giá chưa xác minh cần ghi rõ nguồn và trạng thái.</p>
+</section>
+
+<div class="panel">
+<h2>Quản lý dữ liệu</h2>
+<button style="background:#245c85;width:100%" onclick="exportCSV()">TẢI XUỐNG TOÀN BỘ BÁO GIÁ CSV</button>
+<p class="small">Dữ liệu hiện lưu cục bộ trên trình duyệt. Chưa đồng bộ giữa các thiết bị hoặc người dùng.</p>
+<a href="index.html" style="display:block;margin-top:12px;color:#16734f">← Về trang chủ AI SCRAP</a>
+</div>
+</main>
+<footer>AI SCRAP & WASTE EXCHANGE PRO · Vietnam</footer>
+
+<script>
+const initialMarket=[
+['Đồng đỏ',360000,420000],['Đồng thau',250000,280000],
+['Inox 304',39000,53000],['Inox 316',60000,66000],
+['Phế liệu Niken',410000,700000],['Phế liệu bạc',9000000,19800000],
+['Bo mạch điện tử',19000,11500000],['Hợp kim cứng Wolfram-Cobalt',2200000,6000000]
+];
+let market=JSON.parse(localStorage.getItem('scrapMarket')||'null')||initialMarket.map(x=>({name:x[0],low:x[1],high:x[2],date:'Giá tham khảo ban đầu',source:'Dữ liệu nhập ban đầu'}));
+let quotes=JSON.parse(localStorage.getItem('scrapQuotes')||'[]');
+
+function save(){localStorage.setItem('scrapMarket',JSON.stringify(market));localStorage.setItem('scrapQuotes',JSON.stringify(quotes))}
+function money(n){return Number(n).toLocaleString('vi-VN')+' ₫'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+function showTab(id,btn){
+ document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+ document.getElementById(id).classList.remove('hidden');
+ document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+ btn.classList.add('active');
+ renderAll();
+}
+
+function renderAll(){
+ const ms=(document.getElementById('marketSearch').value||'').toLowerCase();
+ let m=market.filter(x=>x.name.toLowerCase().includes(ms));
+ const sort=document.getElementById('marketSort').value;
+ if(sort==='low')m.sort((a,b)=>a.low-b.low);
+ if(sort==='high')m.sort((a,b)=>b.high-a.high);
+ if(sort==='name')m.sort((a,b)=>a.name.localeCompare(b.name,'vi'));
+ document.getElementById('marketRows').innerHTML=m.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${money(x.low)}</td><td>${money(x.high)}</td><td>${esc(x.date)}</td><td>${esc(x.source)}</td></tr>`).join('')||'<tr><td colspan="5">Không có dữ liệu</td></tr>';
+
+ ['buyer','seller'].forEach(type=>{
+  const search=(document.getElementById(type+'Search').value||'').toLowerCase();
+  const region=document.getElementById(type+'Region').value;
+  const list=quotes.filter(q=>q.type===type&&(!region||q.region===region)&&[q.name,q.material,q.region].join(' ').toLowerCase().includes(search));
+  document.getElementById(type+'Rows').innerHTML=list.map(q=>`<tr><td>${esc(q.name)}</td><td>${esc(q.region)}</td><td>${esc(q.material)}</td><td><b>${money(q.price)}</b></td><td>${Number(q.qty).toLocaleString('vi-VN')}</td><td>${esc(q.date)}</td></tr>`).join('')||'<tr><td colspan="6">Chưa có báo giá. Hãy thêm báo giá bên dưới.</td></tr>';
+ });
+
+ const materials=[...new Set(quotes.map(q=>q.material))];
+ document.getElementById('spreadRows').innerHTML=materials.map(mat=>{
+  const bs=quotes.filter(q=>q.type==='buyer'&&q.material===mat);
+  const ss=quotes.filter(q=>q.type==='seller'&&q.material===mat);
+  if(!bs.length||!ss.length)return '';
+  const buy=Math.max(...bs.map(q=>q.price)),sell=Math.min(...ss.map(q=>q.price)),diff=buy-sell;
+  return `<tr><td>${esc(mat)}</td><td>${money(sell)}</td><td>${money(buy)}</td><td class="${diff>=0?'up':'down'}"><b>${money(diff)}</b></td><td>${diff>0?'Cần kiểm tra chi phí':diff===0?'Hòa vốn':'Không có chênh lệch dương'}</td></tr>`;
+ }).join('')||'<tr><td colspan="5">Cần có cùng loại vật liệu ở cả bảng mua và bảng bán mới能比较。</td></tr>';
+}
+
+function addQuote(){
+ const type=document.getElementById('quoteType').value;
+ const name=document.getElementById('quoteName').value.trim();
+ const region=document.getElementById('quoteRegion').value;
+ const material=document.getElementById('quoteMaterial').value.trim();
+ const price=Number(document.getElementById('quotePrice').value);
+ const qty=Number(document.getElementById('quoteQty').value)||0;
+ const note=document.getElementById('quoteNote').value.trim();
+ if(!name||!material||!Number.isFinite(price)||price<=0){alert('Vui lòng nhập tên, vật liệu và giá hợp lệ.');return}
+ quotes.unshift({type,name,region,material,price,qty,note,date:new Date().toLocaleString('vi-VN')});
+ save();renderAll();
+ ['quoteName','quoteMaterial','quotePrice','quoteQty','quoteNote'].forEach(id=>document.getElementById(id).value='');
+ alert('Đã lưu báo giá trên thiết bị này.');
+}
+
+function exportCSV(){
+ const rows=[['Loại','Tên','Khu vực','Vật liệu','Giá VND/kg','Số lượng kg','Ghi chú','Ngày cập nhật'],...quotes.map(q=>[q.type,q.name,q.region,q.material,q.price,q.qty,q.note,q.date])];
+ const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='AI-SCRAP-quotes.csv';a.click();URL.revokeObjectURL(url);
+}
+renderAll();
+</script>
+</body>
+</html>

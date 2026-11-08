@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123f32">
+<title>AI SCRAP - Smart Profit Calculator</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f6f3;color:#18332b;font-family:Arial,sans-serif}
+header{background:#123f32;color:white;padding:22px 16px}
+header h1{font-size:21px;margin:0 0 7px}
+header p{margin:0;color:#d5e8df;font-size:13px}
+main{max-width:680px;margin:auto;padding:15px}
+.panel{background:white;padding:16px;border-radius:13px;margin-bottom:15px;box-shadow:0 2px 8px #0000000c}
+h2{font-size:18px;margin:4px 0 15px}
+label{display:block;font-size:13px;font-weight:bold;margin:12px 0 6px}
+input,select{width:100%;padding:12px;border:1px solid #ccd8d2;border-radius:8px;font-size:16px;background:white}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tabs button{background:#dce8e1;color:#18332b}
+.tabs button.active{background:#16734f;color:white}
+button,.btn{border:0;border-radius:8px;padding:13px;background:#16734f;color:white;font-size:15px;cursor:pointer;width:100%;margin-top:12px;text-align:center;text-decoration:none;display:block}
+.secondary{background:#245c85}
+.danger{background:#a83232}
+.result{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric{background:#f0f5f1;padding:13px;border-radius:9px}
+.metric small{font-size:12px;color:#66756d}
+.metric strong{display:block;font-size:18px;margin-top:7px;overflow-wrap:anywhere}
+.profit{color:#16734f}
+.loss{color:#b12d2d}
+.note{font-size:12px;color:#718078;line-height:1.6}
+.record{border-top:1px solid #e2e9e4;padding:12px 0;font-size:13px}
+.hidden{display:none}
+@media(max-width:380px){.metric strong{font-size:15px}}
+</style>
+</head>
+<body>
+<header>
+<h1>AI SCRAP - SMART PROFIT CALCULATOR PRO</h1>
+<p>Công cụ tính lợi nhuận mua bán phế liệu</p>
+</header>
+
+<main>
+<div class="panel">
+<h2>Chọn mô hình giao dịch</h2>
+<div class="tabs">
+<button id="tabA" class="active" onclick="setMode('A')">A - Môi giới</button>
+<button id="tabB" onclick="setMode('B')">B - Thu mua bán lại</button>
+</div>
+<p class="note" id="modeNote">Tính thu nhập từ phí môi giới, không cần ôm hàng.</p>
+</div>
+
+<div class="panel">
+<h2>Thông tin hàng hóa</h2>
+<label>Loại phế liệu</label>
+<select id="material">
+<option>Đồng</option><option>Đồng thau</option><option>Nhôm</option>
+<option>Inox 304</option><option>Inox 201</option><option>Inox 316</option>
+<option>Sắt thép</option><option>Chì</option><option>Kẽm</option>
+<option>Thiếc</option><option>Niken</option><option>Wolfram / Tungsten</option>
+<option>Carbide / Hợp kim cứng</option><option>Bo mạch điện tử</option>
+<option>CPU / RAM</option><option>Ắc quy</option><option>Nhựa</option>
+<option>Giấy carton</option><option>Khác</option>
+</select>
+
+<label>Khối lượng (kg)</label>
+<input id="weight" type="number" min="0" step="0.01" value="1000">
+
+<div id="brokerFields">
+<label>Phí môi giới (VND/kg)</label>
+<input id="commission" type="number" min="0" value="500">
+<label>Chi phí môi giới khác (VND)</label>
+<input id="brokerCost" type="number" min="0" value="0">
+</div>
+
+<div id="resaleFields" class="hidden">
+<label>Giá thu mua đầu vào (VND/kg)</label>
+<input id="buyPrice" type="number" min="0" value="10000">
+<label>Giá bán đầu ra (VND/kg)</label>
+<input id="sellPrice" type="number" min="0" value="12000">
+<label>Tỷ lệ hao hụt / tạp chất (%)</label>
+<input id="lossRate" type="number" min="0" max="100" step="0.1" value="2">
+<label>Vận chuyển (VND)</label>
+<input id="transport" type="number" min="0" value="500000">
+<label>Phân loại / kiểm định (VND)</label>
+<input id="sorting" type="number" min="0" value="100000">
+<label>Chi phí khác (VND)</label>
+<input id="otherCost" type="number" min="0" value="0">
+</div>
+
+<button onclick="calculate()">TÍNH LỢI NHUẬN</button>
+</div>
+
+<div class="panel">
+<h2>Kết quả giao dịch</h2>
+<div class="result">
+<div class="metric"><small>Doanh thu</small><strong id="revenue">0 ₫</strong></div>
+<div class="metric"><small>Tổng chi phí</small><strong id="cost">0 ₫</strong></div>
+<div class="metric"><small>Lợi nhuận ròng</small><strong id="profit">0 ₫</strong></div>
+<div class="metric"><small>Tỷ suất lợi nhuận</small><strong id="margin">0%</strong></div>
+<div class="metric"><small>Lợi nhuận / kg</small><strong id="perKg">0 ₫</strong></div>
+<div class="metric"><small>Lợi nhuận / tấn</small><strong id="perTon">0 ₫</strong></div>
+</div>
+<p id="status" class="note">Nhập thông tin để tính toán.</p>
+<button onclick="saveRecord()">LƯU GIAO DỊCH</button>
+<button class="secondary" onclick="exportCSV()">XUẤT FILE CSV</button>
+</div>
+
+<div class="panel">
+<h2>Lịch sử giao dịch</h2>
+<div id="records"><p class="note">Chưa có giao dịch được lưu.</p></div>
+<button class="danger" onclick="clearRecords()">XÓA LỊCH SỬ</button>
+</div>
+
+<p class="note">Lưu ý: Kết quả là ước tính dựa trên dữ liệu bạn nhập. Hãy xác nhận giá mua, giá bán, cấp độ vật liệu, tỷ lệ tạp chất và điều kiện thanh toán trước khi giao dịch. Dữ liệu được lưu trên trình duyệt của thiết bị này.</p>
+<a class="btn secondary" href="index.html">VỀ TRANG CHỦ</a>
+</main>
+
+<script>
+let mode = 'A';
+let lastResult = null;
+let records = JSON.parse(localStorage.getItem('scrapRecords') || '[]');
+
+const num = id => Math.max(0, Number(document.getElementById(id).value) || 0);
+const money = n => Math.round(n).toLocaleString('vi-VN') + ' ₫';
+
+function setMode(m){
+  mode=m;
+  document.getElementById('tabA').classList.toggle('active',m==='A');
+  document.getElementById('tabB').classList.toggle('active',m==='B');
+  document.getElementById('brokerFields').classList.toggle('hidden',m!=='A');
+  document.getElementById('resaleFields').classList.toggle('hidden',m!=='B');
+  document.getElementById('modeNote').textContent=m==='A'
+  ?'Tính thu nhập từ phí môi giới, không cần ôm hàng.'
+  :'Tính lợi nhuận thu mua và bán lại sau khi trừ chi phí, hao hụt.';
+  calculate();
+}
+
+function calculate(){
+  const weight=num('weight');
+  let revenue=0,cost=0,profit=0;
+
+  if(mode==='A'){
+    revenue=weight*num('commission');
+    cost=num('brokerCost');
+    profit=revenue-cost;
+  }else{
+    const loss=Math.min(100,num('lossRate'))/100;
+    const sellable=weight*(1-loss);
+    revenue=sellable*num('sellPrice');
+    cost=weight*num('buyPrice')+num('transport')+num('sorting')+num('otherCost');
+    profit=revenue-cost;
+  }
+
+  const margin=revenue>0?profit/revenue*100:0;
+  lastResult={mode,material:document.getElementById('material').value,weight,revenue,cost,profit,margin};
+  document.getElementById('revenue').textContent=money(revenue);
+  document.getElementById('cost').textContent=money(cost);
+  const p=document.getElementById('profit');
+  p.textContent=money(profit);
+  p.className=profit>=0?'profit':'loss';
+  document.getElementById('margin').textContent=margin.toFixed(2)+'%';
+  document.getElementById('perKg').textContent=money(weight?profit/weight:0);
+  document.getElementById('perTon').textContent=money(weight?profit/weight*1000:0);
+  document.getElementById('status').textContent=profit>0?'Có lợi nhuận theo dữ liệu đã nhập.':profit<0?'CẢNH BÁO: Giao dịch đang lỗ.':'Giao dịch hòa vốn hoặc chưa có dữ liệu.';
+}
+
+function saveRecord(){
+  if(!lastResult || lastResult.weight<=0){alert('Vui lòng nhập khối lượng hợp lệ.');return;}
+  records.unshift({...lastResult,date:new Date().toLocaleString('vi-VN')});
+  localStorage.setItem('scrapRecords',JSON.stringify(records));
+  renderRecords();
+  alert('Đã lưu giao dịch trên thiết bị này.');
+}
+
+function renderRecords(){
+  const box=document.getElementById('records');
+  if(!records.length){box.innerHTML='<p class="note">Chưa có giao dịch được lưu.</p>';return;}
+  box.innerHTML=records.map(r=>`
+    <div class="record">
+    <b>${r.material} - ${r.mode==='A'?'Môi giới':'Thu mua bán lại'}</b><br>
+    ${r.date}<br>
+    Khối lượng: ${r.weight.toLocaleString('vi-VN')} kg<br>
+    Lợi nhuận: <b class="${r.profit>=0?'profit':'loss'}">${money(r.profit)}</b>
+    </div>`).join('');
+}
+
+function exportCSV(){
+  if(!records.length){alert('Chưa có dữ liệu để xuất.');return;}
+  const rows=[['Date','Material','Mode','Weight kg','Revenue VND','Cost VND','Profit VND','Margin %'],
+  ...records.map(r=>[r.date,r.material,r.mode,r.weight,r.revenue,r.cost,r.profit,r.margin.toFixed(2)])];
+  const csv='\uFEFF'+rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='AI-SCRAP-transactions.csv';a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearRecords(){
+  if(!confirm('Bạn có chắc muốn xóa toàn bộ lịch sử?'))return;
+  records=[];localStorage.removeItem('scrapRecords');renderRecords();
+}
+
+renderRecords();
+calculate();
+</script>
+</body>
+</html>

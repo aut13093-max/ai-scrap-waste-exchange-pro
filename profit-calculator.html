@@ -5,19 +5,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#123f32">
-<title>AI SCRAP - Smart Profit Calculator</title>
+<title>AI SCRAP - Smart Profit Calculator PRO</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#f2f6f3;color:#18332b;font-family:Arial,sans-serif}
 header{background:#123f32;color:white;padding:22px 16px}
 header h1{font-size:21px;margin:0 0 7px}
 header p{margin:0;color:#d5e8df;font-size:13px}
-main{max-width:680px;margin:auto;padding:15px}
+main{max-width:720px;margin:auto;padding:15px}
 .panel{background:white;padding:16px;border-radius:13px;margin-bottom:15px;box-shadow:0 2px 8px #0000000c}
 h2{font-size:18px;margin:4px 0 15px}
 label{display:block;font-size:13px;font-weight:bold;margin:12px 0 6px}
 input,select{width:100%;padding:12px;border:1px solid #ccd8d2;border-radius:8px;font-size:16px;background:white}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .tabs button{background:#dce8e1;color:#18332b}
 .tabs button.active{background:#16734f;color:white}
 button,.btn{border:0;border-radius:8px;padding:13px;background:#16734f;color:white;font-size:15px;cursor:pointer;width:100%;margin-top:12px;text-align:center;text-decoration:none;display:block}
@@ -32,178 +33,792 @@ button,.btn{border:0;border-radius:8px;padding:13px;background:#16734f;color:whi
 .note{font-size:12px;color:#718078;line-height:1.6}
 .record{border-top:1px solid #e2e9e4;padding:12px 0;font-size:13px}
 .hidden{display:none}
-@media(max-width:380px){.metric strong{font-size:15px}}
+.warning{background:#fff5df;border-left:4px solid #d99b22;padding:11px;border-radius:7px;color:#71521b;font-size:12px;line-height:1.6}
+.identifier-result{background:#f0f5f1;border-radius:10px;padding:14px;margin-top:14px;line-height:1.7;font-size:13px}
+.identifier-result h3{margin:0 0 10px;font-size:16px}
+.tag{display:inline-block;background:#dce8e1;padding:5px 8px;border-radius:5px;margin:3px}
+hr{border:0;border-top:1px solid #e2e9e4;margin:17px 0}
+@media(max-width:420px){
+.metric strong{font-size:15px}
+.tabs{gap:5px}
+.tabs button{font-size:12px;padding:11px 4px}
+}
 </style>
 </head>
+
 <body>
+
 <header>
 <h1>AI SCRAP - SMART PROFIT CALCULATOR PRO</h1>
-<p>Công cụ tính lợi nhuận mua bán phế liệu</p>
+<p>Công cụ giao dịch phế liệu và nhận diện linh kiện điện tử</p>
 </header>
 
 <main>
+
+<!-- A B C CALCULATOR -->
+
 <div class="panel">
 <h2>Chọn mô hình giao dịch</h2>
+
 <div class="tabs">
 <button id="tabA" class="active" onclick="setMode('A')">A - Môi giới</button>
-<button id="tabB" onclick="setMode('B')">B - Thu mua bán lại</button>
+<button id="tabB" onclick="setMode('B')">B - Thu mua</button>
+<button id="tabC" onclick="setMode('C')">C - Thu hồi vàng</button>
 </div>
+
 <p class="note" id="modeNote">Tính thu nhập từ phí môi giới, không cần ôm hàng.</p>
 </div>
 
 <div class="panel">
+
 <h2>Thông tin hàng hóa</h2>
+
+<div id="generalFields">
+
 <label>Loại phế liệu</label>
 <select id="material">
-<option>Đồng</option><option>Đồng thau</option><option>Nhôm</option>
-<option>Inox 304</option><option>Inox 201</option><option>Inox 316</option>
-<option>Sắt thép</option><option>Chì</option><option>Kẽm</option>
-<option>Thiếc</option><option>Niken</option><option>Wolfram / Tungsten</option>
-<option>Carbide / Hợp kim cứng</option><option>Bo mạch điện tử</option>
-<option>CPU / RAM</option><option>Ắc quy</option><option>Nhựa</option>
-<option>Giấy carton</option><option>Khác</option>
+<option>Đồng</option>
+<option>Đồng thau</option>
+<option>Nhôm</option>
+<option>Inox 304</option>
+<option>Inox 201</option>
+<option>Inox 316</option>
+<option>Sắt thép</option>
+<option>Chì</option>
+<option>Kẽm</option>
+<option>Thiếc</option>
+<option>Niken</option>
+<option>Wolfram / Tungsten</option>
+<option>Carbide / Hợp kim cứng</option>
+<option>Bo mạch điện tử</option>
+<option>CPU / RAM</option>
+<option>Ắc quy</option>
+<option>Nhựa</option>
+<option>Giấy carton</option>
+<option>Khác</option>
 </select>
 
 <label>Khối lượng (kg)</label>
 <input id="weight" type="number" min="0" step="0.01" value="1000">
 
+</div>
+
 <div id="brokerFields">
+
 <label>Phí môi giới (VND/kg)</label>
 <input id="commission" type="number" min="0" value="500">
+
 <label>Chi phí môi giới khác (VND)</label>
 <input id="brokerCost" type="number" min="0" value="0">
+
 </div>
 
 <div id="resaleFields" class="hidden">
+
 <label>Giá thu mua đầu vào (VND/kg)</label>
 <input id="buyPrice" type="number" min="0" value="10000">
+
 <label>Giá bán đầu ra (VND/kg)</label>
 <input id="sellPrice" type="number" min="0" value="12000">
+
 <label>Tỷ lệ hao hụt / tạp chất (%)</label>
 <input id="lossRate" type="number" min="0" max="100" step="0.1" value="2">
+
 <label>Vận chuyển (VND)</label>
 <input id="transport" type="number" min="0" value="500000">
+
 <label>Phân loại / kiểm định (VND)</label>
 <input id="sorting" type="number" min="0" value="100000">
+
 <label>Chi phí khác (VND)</label>
 <input id="otherCost" type="number" min="0" value="0">
+
+</div>
+
+<div id="goldFields" class="hidden">
+
+<div class="warning">
+Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng của phòng thí nghiệm trên mẫu đại diện. Không dùng ảnh hoặc kết quả XRF bề mặt để khẳng định hàm lượng của toàn bộ lô hàng.
+</div>
+
+<label>Phân loại phế liệu điện tử</label>
+<select id="goldMaterial">
+<option>CPU - Bộ vi xử lý</option>
+<option>RAM - Thanh bộ nhớ</option>
+<option>Bo mạch chủ máy tính</option>
+<option>Bo mạch điện thoại</option>
+<option>Bo mạch máy chủ</option>
+<option>Bo mạch viễn thông</option>
+<option>Phế liệu điện tử hỗn hợp</option>
+</select>
+
+<label>Khối lượng đầu vào (kg)</label>
+<input id="goldWeight" type="number" min="0" step="0.01" value="10">
+
+<label>Hàm lượng vàng theo phòng thí nghiệm (g/kg)</label>
+<input id="goldContent" type="number" min="0" step="0.001" value="0">
+
+<label>Tỷ lệ thu hồi thực tế (%)</label>
+<input id="recoveryRate" type="number" min="0" max="100" step="0.1" value="90">
+
+<label>Giá vàng thanh toán (VND/g)</label>
+<input id="goldPrice" type="number" min="0" value="0">
+
+<label>Giá thu mua phế liệu (VND/kg)</label>
+<input id="goldBuyPrice" type="number" min="0" value="0">
+
+<label>Phí tinh luyện (VND/kg)</label>
+<input id="refiningFee" type="number" min="0" value="0">
+
+<label>Phí kiểm định (VND)</label>
+<input id="assayFee" type="number" min="0" value="0">
+
+<label>Vận chuyển (VND)</label>
+<input id="goldTransport" type="number" min="0" value="0">
+
+<label>Chi phí khác (VND)</label>
+<input id="goldOtherCost" type="number" min="0" value="0">
+
 </div>
 
 <button onclick="calculate()">TÍNH LỢI NHUẬN</button>
+
 </div>
 
+<!-- RESULT -->
+
 <div class="panel">
+
 <h2>Kết quả giao dịch</h2>
+
 <div class="result">
-<div class="metric"><small>Doanh thu</small><strong id="revenue">0 ₫</strong></div>
-<div class="metric"><small>Tổng chi phí</small><strong id="cost">0 ₫</strong></div>
-<div class="metric"><small>Lợi nhuận ròng</small><strong id="profit">0 ₫</strong></div>
-<div class="metric"><small>Tỷ suất lợi nhuận</small><strong id="margin">0%</strong></div>
-<div class="metric"><small>Lợi nhuận / kg</small><strong id="perKg">0 ₫</strong></div>
-<div class="metric"><small>Lợi nhuận / tấn</small><strong id="perTon">0 ₫</strong></div>
+
+<div class="metric">
+<small>Doanh thu</small>
+<strong id="revenue">0 ₫</strong>
 </div>
+
+<div class="metric">
+<small>Tổng chi phí</small>
+<strong id="cost">0 ₫</strong>
+</div>
+
+<div class="metric">
+<small>Lợi nhuận ròng</small>
+<strong id="profit">0 ₫</strong>
+</div>
+
+<div class="metric">
+<small>Tỷ suất lợi nhuận</small>
+<strong id="margin">0%</strong>
+</div>
+
+<div class="metric">
+<small>Lợi nhuận / kg</small>
+<strong id="perKg">0 ₫</strong>
+</div>
+
+<div class="metric">
+<small>Lợi nhuận / tấn</small>
+<strong id="perTon">0 ₫</strong>
+</div>
+
+</div>
+
+<div id="goldResults" class="hidden">
+
+<hr>
+
+<h2>Kết quả thu hồi vàng</h2>
+
+<div class="result">
+
+<div class="metric">
+<small>Vàng dự kiến thu hồi</small>
+<strong id="recoveredGold">0 g</strong>
+</div>
+
+<div class="metric">
+<small>Doanh thu vàng</small>
+<strong id="goldRevenue">0 ₫</strong>
+</div>
+
+<div class="metric">
+<small>Chi phí không gồm mua hàng</small>
+<strong id="nonPurchaseCost">0 ₫</strong>
+</div>
+
+<div class="metric">
+<small>Giá mua hòa vốn tối đa</small>
+<strong id="breakEvenBuy">0 ₫/kg</strong>
+</div>
+
+</div>
+
+<p class="note">Giá mua hòa vốn tối đa được tính theo dữ liệu nhập, chưa tính các khoản thuế hoặc chi phí chưa khai báo.</p>
+
+</div>
+
 <p id="status" class="note">Nhập thông tin để tính toán.</p>
+
 <button onclick="saveRecord()">LƯU GIAO DỊCH</button>
 <button class="secondary" onclick="exportCSV()">XUẤT FILE CSV</button>
+
 </div>
+
+<!-- D IDENTIFIER -->
 
 <div class="panel">
-<h2>Lịch sử giao dịch</h2>
-<div id="records"><p class="note">Chưa có giao dịch được lưu.</p></div>
-<button class="danger" onclick="clearRecords()">XÓA LỊCH SỬ</button>
+
+<h2>🔬 D - AI QUÝ KIM LOẠI IDENTIFIER PRO</h2>
+
+<p class="note">
+Công cụ hỗ trợ nhận diện linh kiện điện tử theo mã số và phân loại khả năng có kim loại quý.
+</p>
+
+<div class="warning">
+Kết quả là nhận định sơ bộ dựa trên thông tin người dùng nhập. Không phải kết quả phân tích thành phần hóa học hoặc hàm lượng vàng thực tế.
 </div>
 
-<p class="note">Lưu ý: Kết quả là ước tính dựa trên dữ liệu bạn nhập. Hãy xác nhận giá mua, giá bán, cấp độ vật liệu, tỷ lệ tạp chất và điều kiện thanh toán trước khi giao dịch. Dữ liệu được lưu trên trình duyệt của thiết bị này.</p>
+<label>Mã linh kiện / Chip Number</label>
+<input id="partCode" type="text" placeholder="Ví dụ: SRxxxx, OPN, IC marking...">
+
+<label>Nhà sản xuất</label>
+<input id="partBrand" type="text" placeholder="Intel, AMD, Samsung, Texas Instruments...">
+
+<label>Loại linh kiện</label>
+<select id="partType">
+<option value="">Chọn loại linh kiện</option>
+<option>CPU</option>
+<option>RAM</option>
+<option>Bo mạch chủ</option>
+<option>Bo mạch điện thoại</option>
+<option>Bo mạch máy chủ</option>
+<option>IC / Chip</option>
+<option>Đầu nối / Chân tiếp xúc</option>
+<option>Tụ điện MLCC</option>
+<option>Linh kiện điện tử khác</option>
+</select>
+
+<label>Thông tin bổ sung</label>
+<input id="partNotes" type="text" placeholder="Mã trên mặt chip, màu chân, tình trạng...">
+
+<button onclick="identifyPart()">PHÂN TÍCH LINH KIỆN</button>
+
+<div id="partResult" class="identifier-result">
+Chưa có kết quả nhận diện.
+</div>
+
+<button class="secondary" onclick="savePart()">LƯU LINH KIỆN</button>
+
+<h2 style="margin-top:22px">Lịch sử nhận diện linh kiện</h2>
+<div id="partRecords">
+<p class="note">Chưa có linh kiện được lưu.</p>
+</div>
+
+</div>
+
+<!-- TRANSACTION HISTORY -->
+
+<div class="panel">
+
+<h2>Lịch sử giao dịch</h2>
+
+<div id="records">
+<p class="note">Chưa có giao dịch được lưu.</p>
+</div>
+
+<button class="danger" onclick="clearRecords()">XÓA LỊCH SỬ GIAO DỊCH</button>
+<button class="danger" onclick="clearPartRecords()">XÓA LỊCH SỬ LINH KIỆN</button>
+
+</div>
+
+<p class="note">
+Lưu ý: Kết quả tính toán là ước tính dựa trên dữ liệu bạn nhập. Giá vàng, hàm lượng vàng và tỷ lệ thu hồi phải được xác nhận bằng kết quả kiểm nghiệm và điều kiện thanh toán thực tế. Chưa tính doanh thu bạc hoặc palladium. Dữ liệu được lưu trên trình duyệt của thiết bị này.
+</p>
+
 <a class="btn secondary" href="index.html">VỀ TRANG CHỦ</a>
+
 </main>
 
 <script>
-let mode = 'A';
-let lastResult = null;
-let records = JSON.parse(localStorage.getItem('scrapRecords') || '[]');
 
-const num = id => Math.max(0, Number(document.getElementById(id).value) || 0);
-const money = n => Math.round(n).toLocaleString('vi-VN') + ' ₫';
+let mode='A';
+let lastResult=null;
+let lastPart=null;
+let records=[];
+let partRecords=[];
+
+try{
+records=JSON.parse(localStorage.getItem('scrapRecords')||'[]');
+if(!Array.isArray(records))records=[];
+}catch(e){records=[];}
+
+try{
+partRecords=JSON.parse(localStorage.getItem('scrapPartRecords')||'[]');
+if(!Array.isArray(partRecords))partRecords=[];
+}catch(e){partRecords=[];}
+
+const num=id=>Math.max(0,Number(document.getElementById(id).value)||0);
+const val=id=>document.getElementById(id).value;
+const money=n=>Math.round(n).toLocaleString('vi-VN')+' ₫';
+
+function escapeHTML(s){
+return String(s??'').replace(/[&<>"']/g,c=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#39;'
+}[c]));
+}
+
+// MODE SWITCH
 
 function setMode(m){
-  mode=m;
-  document.getElementById('tabA').classList.toggle('active',m==='A');
-  document.getElementById('tabB').classList.toggle('active',m==='B');
-  document.getElementById('brokerFields').classList.toggle('hidden',m!=='A');
-  document.getElementById('resaleFields').classList.toggle('hidden',m!=='B');
-  document.getElementById('modeNote').textContent=m==='A'
-  ?'Tính thu nhập từ phí môi giới, không cần ôm hàng.'
-  :'Tính lợi nhuận thu mua và bán lại sau khi trừ chi phí, hao hụt.';
-  calculate();
+
+mode=m;
+
+document.getElementById('tabA').classList.toggle('active',m==='A');
+document.getElementById('tabB').classList.toggle('active',m==='B');
+document.getElementById('tabC').classList.toggle('active',m==='C');
+
+document.getElementById('brokerFields').classList.toggle('hidden',m!=='A');
+document.getElementById('resaleFields').classList.toggle('hidden',m!=='B');
+document.getElementById('goldFields').classList.toggle('hidden',m!=='C');
+document.getElementById('goldResults').classList.toggle('hidden',m!=='C');
+document.getElementById('generalFields').classList.toggle('hidden',m==='C');
+
+const notes={
+A:'Tính thu nhập từ phí môi giới, không cần ôm hàng.',
+B:'Tính lợi nhuận thu mua và bán lại sau khi trừ chi phí, hao hụt.',
+C:'Tính lợi nhuận thu hồi vàng từ phế liệu điện tử theo kết quả kiểm nghiệm.'
+};
+
+document.getElementById('modeNote').textContent=notes[m];
+
+calculate();
+
 }
+
+// CALCULATOR
 
 function calculate(){
-  const weight=num('weight');
-  let revenue=0,cost=0,profit=0;
 
-  if(mode==='A'){
-    revenue=weight*num('commission');
-    cost=num('brokerCost');
-    profit=revenue-cost;
-  }else{
-    const loss=Math.min(100,num('lossRate'))/100;
-    const sellable=weight*(1-loss);
-    revenue=sellable*num('sellPrice');
-    cost=weight*num('buyPrice')+num('transport')+num('sorting')+num('otherCost');
-    profit=revenue-cost;
-  }
+let revenue=0;
+let cost=0;
+let profit=0;
+let weight=0;
+let extra={};
 
-  const margin=revenue>0?profit/revenue*100:0;
-  lastResult={mode,material:document.getElementById('material').value,weight,revenue,cost,profit,margin};
-  document.getElementById('revenue').textContent=money(revenue);
-  document.getElementById('cost').textContent=money(cost);
-  const p=document.getElementById('profit');
-  p.textContent=money(profit);
-  p.className=profit>=0?'profit':'loss';
-  document.getElementById('margin').textContent=margin.toFixed(2)+'%';
-  document.getElementById('perKg').textContent=money(weight?profit/weight:0);
-  document.getElementById('perTon').textContent=money(weight?profit/weight*1000:0);
-  document.getElementById('status').textContent=profit>0?'Có lợi nhuận theo dữ liệu đã nhập.':profit<0?'CẢNH BÁO: Giao dịch đang lỗ.':'Giao dịch hòa vốn hoặc chưa có dữ liệu.';
+if(mode==='A'){
+
+weight=num('weight');
+revenue=weight*num('commission');
+cost=num('brokerCost');
+profit=revenue-cost;
+
 }
 
+if(mode==='B'){
+
+weight=num('weight');
+
+const loss=Math.min(100,num('lossRate'))/100;
+const sellable=weight*(1-loss);
+
+revenue=sellable*num('sellPrice');
+
+cost=weight*num('buyPrice')+
+num('transport')+
+num('sorting')+
+num('otherCost');
+
+profit=revenue-cost;
+
+}
+
+if(mode==='C'){
+
+weight=num('goldWeight');
+
+const content=num('goldContent');
+const recovery=Math.min(100,num('recoveryRate'))/100;
+const goldPrice=num('goldPrice');
+
+const estimatedGold=weight*content*recovery;
+
+revenue=estimatedGold*goldPrice;
+
+const purchaseCost=weight*num('goldBuyPrice');
+
+const processingCost=
+weight*num('refiningFee')+
+num('assayFee')+
+num('goldTransport')+
+num('goldOtherCost');
+
+cost=purchaseCost+processingCost;
+profit=revenue-cost;
+
+const breakEven=weight>0?
+(revenue-processingCost)/weight:0;
+
+extra={
+goldMaterial:val('goldMaterial'),
+goldContent:content,
+recoveryRate:recovery*100,
+goldPrice:goldPrice,
+recoveredGold:estimatedGold,
+purchaseCost:purchaseCost,
+processingCost:processingCost,
+breakEvenBuy:breakEven
+};
+
+document.getElementById('recoveredGold').textContent=
+estimatedGold.toFixed(3)+' g';
+
+document.getElementById('goldRevenue').textContent=money(revenue);
+document.getElementById('nonPurchaseCost').textContent=money(processingCost);
+document.getElementById('breakEvenBuy').textContent=money(breakEven)+'/kg';
+
+}
+
+const margin=revenue>0?profit/revenue*100:0;
+
+const material=mode==='C'?val('goldMaterial'):val('material');
+
+lastResult={
+mode,
+material,
+weight,
+revenue,
+cost,
+profit,
+margin,
+...extra
+};
+
+document.getElementById('revenue').textContent=money(revenue);
+document.getElementById('cost').textContent=money(cost);
+
+const p=document.getElementById('profit');
+p.textContent=money(profit);
+p.className=profit>=0?'profit':'loss';
+
+document.getElementById('margin').textContent=margin.toFixed(2)+'%';
+document.getElementById('perKg').textContent=money(weight?profit/weight:0);
+document.getElementById('perTon').textContent=money(weight?profit/weight*1000:0);
+
+let status=profit>0?
+'Có lợi nhuận theo dữ liệu đã nhập.':
+profit<0?
+'CẢNH BÁO: Giao dịch đang lỗ.':
+'Giao dịch hòa vốn hoặc chưa có dữ liệu.';
+
+if(mode==='C'&&(num('goldContent')===0||num('goldPrice')===0)){
+status='Chưa đủ dữ liệu vàng. Hãy nhập hàm lượng kiểm nghiệm và giá vàng thanh toán.';
+}
+
+document.getElementById('status').textContent=status;
+
+}
+
+// SAVE TRANSACTION
+
 function saveRecord(){
-  if(!lastResult || lastResult.weight<=0){alert('Vui lòng nhập khối lượng hợp lệ.');return;}
-  records.unshift({...lastResult,date:new Date().toLocaleString('vi-VN')});
-  localStorage.setItem('scrapRecords',JSON.stringify(records));
-  renderRecords();
-  alert('Đã lưu giao dịch trên thiết bị này.');
+
+if(!lastResult||lastResult.weight<=0){
+alert('Vui lòng nhập khối lượng hợp lệ.');
+return;
+}
+
+records.unshift({
+...lastResult,
+date:new Date().toLocaleString('vi-VN')
+});
+
+try{
+localStorage.setItem('scrapRecords',JSON.stringify(records));
+renderRecords();
+alert('Đã lưu giao dịch trên thiết bị này.');
+}catch(e){
+alert('Không thể lưu dữ liệu. Bộ nhớ trình duyệt có thể đã đầy.');
+}
+
 }
 
 function renderRecords(){
-  const box=document.getElementById('records');
-  if(!records.length){box.innerHTML='<p class="note">Chưa có giao dịch được lưu.</p>';return;}
-  box.innerHTML=records.map(r=>`
-    <div class="record">
-    <b>${r.material} - ${r.mode==='A'?'Môi giới':'Thu mua bán lại'}</b><br>
-    ${r.date}<br>
-    Khối lượng: ${r.weight.toLocaleString('vi-VN')} kg<br>
-    Lợi nhuận: <b class="${r.profit>=0?'profit':'loss'}">${money(r.profit)}</b>
-    </div>`).join('');
+
+const box=document.getElementById('records');
+
+if(!records.length){
+box.innerHTML='<p class="note">Chưa có giao dịch được lưu.</p>';
+return;
 }
+
+box.innerHTML=records.map(r=>`
+<div class="record">
+<b>${escapeHTML(r.material)} - ${r.mode==='A'?'Môi giới':r.mode==='B'?'Thu mua bán lại':'Thu hồi vàng điện tử'}</b><br>
+${escapeHTML(r.date||'')}<br>
+Khối lượng: ${Number(r.weight||0).toLocaleString('vi-VN')} kg<br>
+${r.mode==='C'?'Vàng dự kiến: '+Number(r.recoveredGold||0).toFixed(3)+' g<br>':''}
+Lợi nhuận:
+<b class="${r.profit>=0?'profit':'loss'}">${money(Number(r.profit)||0)}</b>
+</div>
+`).join('');
+
+}
+
+// CSV
 
 function exportCSV(){
-  if(!records.length){alert('Chưa có dữ liệu để xuất.');return;}
-  const rows=[['Date','Material','Mode','Weight kg','Revenue VND','Cost VND','Profit VND','Margin %'],
-  ...records.map(r=>[r.date,r.material,r.mode,r.weight,r.revenue,r.cost,r.profit,r.margin.toFixed(2)])];
-  const csv='\uFEFF'+rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='AI-SCRAP-transactions.csv';a.click();
-  URL.revokeObjectURL(url);
+
+if(!records.length){
+alert('Chưa có dữ liệu để xuất.');
+return;
 }
+
+const headers=[
+'Date','Material','Mode','Weight kg',
+'Gold content g/kg','Recovery rate %',
+'Recovered gold g','Gold price VND/g',
+'Revenue VND','Cost VND','Profit VND','Margin %',
+'Break-even buy price VND/kg'
+];
+
+const rows=[
+headers,
+...records.map(r=>[
+r.date||'',
+r.material||'',
+r.mode||'',
+r.weight||0,
+r.goldContent||'',
+r.recoveryRate||'',
+r.recoveredGold||'',
+r.goldPrice||'',
+r.revenue||0,
+r.cost||0,
+r.profit||0,
+Number(r.margin||0).toFixed(2),
+r.breakEvenBuy||''
+])
+];
+
+const csv='\uFEFF'+rows.map(row=>
+row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')
+).join('\n');
+
+const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+
+a.href=url;
+a.download='AI-SCRAP-transactions.csv';
+a.click();
+
+URL.revokeObjectURL(url);
+
+}
+
+// IDENTIFIER D
+
+function identifyPart(){
+
+const code=val('partCode').trim();
+const brand=val('partBrand').trim();
+const type=val('partType');
+const notes=val('partNotes').trim();
+
+if(!code&&!type){
+alert('Vui lòng nhập mã linh kiện hoặc chọn loại linh kiện.');
+return;
+}
+
+let metals=[];
+let priority='Chưa xác định';
+let explanation='';
+let recommendation='Cần xác định chính xác mã linh kiện và cấu trúc trước khi định giá.';
+
+const t=type.toLowerCase();
+const b=brand.toLowerCase();
+const c=code.toUpperCase();
+
+if(t==='cpu'){
+
+metals=['Vàng có thể có ở chân tiếp xúc hoặc lớp mạ','Bạc có thể có trong một số thành phần'];
+priority='Ưu tiên kiểm tra cao';
+explanation='CPU có thể có các điểm tiếp xúc mạ vàng hoặc vật liệu chứa kim loại quý. Cấu trúc thay đổi theo thế hệ và loại đóng gói.';
+recommendation='Phân loại theo loại CPU, dạng chân và vật liệu đóng gói. Lấy mẫu đại diện để kiểm nghiệm.';
+
+}else if(t==='ram'){
+
+metals=['Vàng có thể có ở chân tiếp xúc'];
+priority='Ưu tiên kiểm tra cao';
+explanation='Thanh RAM thường có các điểm tiếp xúc dạng edge connector. Lớp mạ và hàm lượng kim loại thay đổi theo sản phẩm.';
+recommendation='Tách RAM khỏi bo mạch, phân loại theo loại và tình trạng chân tiếp xúc.';
+
+}else if(t.includes('bo mạch')){
+
+metals=['Vàng có thể có ở đầu nối và điểm tiếp xúc','Bạc có thể có trong mối hàn và linh kiện','Palladium có thể có trong một số linh kiện'];
+priority='Ưu tiên kiểm tra';
+explanation='Bo mạch điện tử có thể chứa kim loại quý trong đầu nối, linh kiện và một số lớp mạ. Hàm lượng toàn bo mạch phụ thuộc loại bo và tuổi đời.';
+recommendation='Phân loại bo mạch theo nhóm: máy tính, điện thoại, máy chủ hoặc viễn thông. Không trộn lẫn các cấp vật liệu.';
+
+}else if(t==='ic / chip'){
+
+metals=['Vàng có thể có trong dây nối hoặc chân tiếp xúc','Bạc có thể có trong một số hợp chất','Palladium có thể có trong một số cấu trúc linh kiện'];
+priority='Cần kiểm tra theo mã';
+explanation='IC có nhiều kiểu đóng gói khác nhau. Không thể xác định kim loại quý chỉ từ chữ in trên mặt chip.';
+recommendation='Tra cứu mã đầy đủ, nhà sản xuất và datasheet. Sau đó mới chọn mẫu để phân tích.';
+
+}else if(t.includes('đầu nối')){
+
+metals=['Vàng có thể có ở lớp mạ tiếp xúc','Bạc có thể có trong một số tiếp điểm'];
+priority='Ưu tiên kiểm tra';
+explanation='Một số đầu nối điện tử dùng lớp mạ vàng để tăng độ ổn định tiếp xúc. Không phải mọi đầu nối đều được mạ vàng.';
+recommendation='Kiểm tra vị trí tiếp xúc, độ dày lớp mạ và tài liệu kỹ thuật.';
+
+}else if(t.includes('mlcc')){
+
+metals=['Bạc có thể có trong một số cấu trúc điện cực','Palladium có thể có trong một số dòng MLCC cũ'];
+priority='Cần xác định mã và thế hệ';
+explanation='Thành phần điện cực MLCC thay đổi theo công nghệ và thời kỳ sản xuất. Không thể kết luận có palladium chỉ từ hình dạng tụ.';
+recommendation='Tra mã, kích thước, datasheet và kiểm nghiệm mẫu đại diện.';
+
+}else if(t==='linh kiện điện tử khác'){
+
+metals=['Có thể có vàng, bạc hoặc palladium tùy cấu tạo'];
+priority='Chưa xác định';
+explanation='Chưa đủ thông tin để nhận diện thành phần vật liệu.';
+recommendation='Chụp ảnh rõ hai mặt, ghi mã đầy đủ và xác định loại linh kiện.';
+
+}else{
+
+metals=['Chưa đủ thông tin để kết luận'];
+priority='Chưa xác định';
+explanation='Cần chọn loại linh kiện để đưa ra đánh giá sơ bộ.';
+}
+
+if(!code){
+explanation+=' Chưa có mã linh kiện để tra cứu cụ thể.';
+}else{
+explanation+=' Mã được cung cấp: '+code+'. Đây chưa phải kết quả tra cứu cơ sở dữ liệu nhà sản xuất.';
+}
+
+if(brand){
+explanation+=' Nhà sản xuất khai báo: '+brand+'.';
+}
+
+if(notes){
+explanation+=' Ghi chú: '+notes+'.';
+}
+
+lastPart={
+code,
+brand,
+type,
+notes,
+metals,
+priority,
+explanation,
+recommendation,
+date:new Date().toLocaleString('vi-VN')
+};
+
+document.getElementById('partResult').innerHTML=`
+<h3>Kết quả phân tích sơ bộ</h3>
+<b>Mã linh kiện:</b> ${escapeHTML(code||'Chưa nhập')}<br>
+<b>Nhà sản xuất:</b> ${escapeHTML(brand||'Chưa xác định')}<br>
+<b>Loại linh kiện:</b> ${escapeHTML(type||'Chưa xác định')}<br>
+<b>Mức ưu tiên:</b> <span class="tag">${escapeHTML(priority)}</span>
+<hr>
+<b>Kim loại quý có khả năng xuất hiện:</b><br>
+${metals.map(x=>'<span class="tag">'+escapeHTML(x)+'</span>').join('')}
+<hr>
+<b>Phân tích:</b><br>
+${escapeHTML(explanation)}
+<hr>
+<b>Đề xuất:</b><br>
+${escapeHTML(recommendation)}
+<hr>
+<b>Độ xác nhận:</b> Chưa được xác minh bằng datasheet hoặc kiểm nghiệm hóa học.
+`;
+
+}
+
+// SAVE IDENTIFIER
+
+function savePart(){
+
+if(!lastPart){
+alert('Vui lòng phân tích linh kiện trước.');
+return;
+}
+
+partRecords.unshift({...lastPart});
+
+try{
+localStorage.setItem('scrapPartRecords',JSON.stringify(partRecords));
+renderPartRecords();
+alert('Đã lưu linh kiện trên thiết bị này.');
+}catch(e){
+alert('Không thể lưu dữ liệu.');
+}
+
+}
+
+function renderPartRecords(){
+
+const box=document.getElementById('partRecords');
+
+if(!partRecords.length){
+box.innerHTML='<p class="note">Chưa có linh kiện được lưu.</p>';
+return;
+}
+
+box.innerHTML=partRecords.map(r=>`
+<div class="record">
+<b>${escapeHTML(r.code||'Không có mã')}</b><br>
+${escapeHTML(r.type||'Chưa xác định')}<br>
+Nhà sản xuất: ${escapeHTML(r.brand||'Chưa xác định')}<br>
+Mức ưu tiên: ${escapeHTML(r.priority||'Chưa xác định')}<br>
+${escapeHTML(r.date||'')}
+</div>
+`).join('');
+
+}
+
+// CLEAR DATA
 
 function clearRecords(){
-  if(!confirm('Bạn có chắc muốn xóa toàn bộ lịch sử?'))return;
-  records=[];localStorage.removeItem('scrapRecords');renderRecords();
+
+if(!confirm('Bạn có chắc muốn xóa toàn bộ lịch sử giao dịch?'))return;
+
+records=[];
+localStorage.removeItem('scrapRecords');
+renderRecords();
+
 }
 
+function clearPartRecords(){
+
+if(!confirm('Bạn có chắc muốn xóa toàn bộ lịch sử linh kiện?'))return;
+
+partRecords=[];
+localStorage.removeItem('scrapPartRecords');
+renderPartRecords();
+
+}
+
+// INITIALIZE
+
 renderRecords();
+renderPartRecords();
 calculate();
+
 </script>
+
 </body>
 </html>

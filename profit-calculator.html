@@ -408,20 +408,21 @@ async function lookupCpuModel(){
   const box = document.getElementById('cpuLookupResult');
   if(!query){ box.textContent = 'Vui lòng nhập mã hoặc model CPU.'; return; }
   box.textContent = 'Đang tra cứu cơ sở dữ liệu AI SCRAP...';
-  const { data, error } = await supabaseClient
-    .from('cpu_assay_records')
-    .select('model_name, au_g_per_kg, ag_g_per_kg, pd_g_per_kg, pt_g_per_kg, is_verified')
-    .ilike('model_name', query)
-    .limit(1);
-  if(error){
-    console.error('Supabase CPU lookup error:', error);
-    box.textContent = 'Không thể kết nối cơ sở dữ liệu. Vui lòng thử lại sau.';
-    return;
-  }
-  if(!data || !data.length){
-    box.innerHTML = '<b>Chưa có dữ liệu kiểm nghiệm cho model này.</b><br>Không thể xác định hàm lượng kim loại chỉ dựa vào tên CPU. Cần kiểm nghiệm mẫu đại diện và由管理员录入数据库。';
-    return;
-  }
+  try {
+    const { data, error } = await supabaseClient
+      .from('cpu_assay_records')
+      .select('model_name, au_g_per_kg, ag_g_per_kg, pd_g_per_kg, pt_g_per_kg, is_verified')
+      .ilike('model_name', query)
+      .limit(1);
+    if(error){
+      console.error('Supabase CPU lookup error:', error);
+      box.textContent = 'Lỗi Supabase: ' + (error.code || 'NO_CODE') + ' — ' + (error.message || 'Không rõ nguyên nhân');
+      return;
+    }
+    if(!data || !data.length){
+      box.innerHTML = '<b>Chưa có dữ liệu kiểm nghiệm cho model này.</b><br>Không thể xác định hàm lượng kim loại chỉ dựa vào tên CPU. Cần kiểm nghiệm mẫu đại diện và quản trị viên nhập dữ liệu.';
+      return;
+    }
   const r = data[0];
   document.getElementById('goldContent').value = r.au_g_per_kg ?? 0;
   document.getElementById('silverContent').value = r.ag_g_per_kg ?? 0;
@@ -434,6 +435,10 @@ async function lookupCpuModel(){
     '<br>Pd: ' + Number(r.pd_g_per_kg || 0).toFixed(3) + ' g/kg' +
     '<br>Pt: ' + Number(r.pt_g_per_kg || 0).toFixed(3) + ' g/kg' +
     '<br><span class="note">检测状态：' + (r.is_verified ? '已验证' : '未验证') + '。数据来自 AI SCRAP 云端数据库。</span>';
+  } catch (e) {
+    console.error('Supabase CPU lookup exception:', e);
+    box.textContent = '连接异常：' + (e && e.message ? e.message : String(e));
+  }
 }
 function saveCpuAssay(){
   document.getElementById('cpuLookupResult').textContent =

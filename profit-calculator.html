@@ -411,8 +411,8 @@ async function lookupCpuModel(){
   try {
     const { data, error } = await supabaseClient
       .from('cpu_assay_records')
-      .select('model_name, au_g_per_kg, ag_g_per_kg, pd_g_per_kg, pt_g_per_kg, is_verified')
-      .ilike('model_name', query)
+      .select('imodel_named, au_g_per_kgcreated_at, ag_g_per_kg, pd_g_per_kg, pt_g_per_kg, is_verified')
+      .ilike('imodel_named', query)
       .limit(1);
     if(error){
       console.error('Supabase CPU lookup error:', error);
@@ -424,13 +424,13 @@ async function lookupCpuModel(){
       return;
     }
   const r = data[0];
-  document.getElementById('goldContent').value = r.au_g_per_kg ?? 0;
+  document.getElementById('goldContent').value = r.au_g_per_kgcreated_at ?? 0;
   document.getElementById('silverContent').value = r.ag_g_per_kg ?? 0;
   document.getElementById('palladiumContent').value = r.pd_g_per_kg ?? 0;
   document.getElementById('platinumContent').value = r.pt_g_per_kg ?? 0;
   calculatePreciousMetal();
-  box.innerHTML = '<b>已找到云端检测记录。</b><br>Model: ' + escapeHTML(r.model_name) +
-    '<br>Au: ' + Number(r.au_g_per_kg || 0).toFixed(3) + ' g/kg' +
+  box.innerHTML = '<b>已找到云端检测记录。</b><br>Model: ' + escapeHTML(r.imodel_named) +
+    '<br>Au: ' + Number(r.au_g_per_kgcreated_at || 0).toFixed(3) + ' g/kg' +
     '<br>Ag: ' + Number(r.ag_g_per_kg || 0).toFixed(3) + ' g/kg' +
     '<br>Pd: ' + Number(r.pd_g_per_kg || 0).toFixed(3) + ' g/kg' +
     '<br>Pt: ' + Number(r.pt_g_per_kg || 0).toFixed(3) + ' g/kg' +

@@ -155,14 +155,19 @@ Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng c
 <label>Khối lượng đầu vào (kg)</label>
 <input id="goldWeight" type="number" min="0" step="0.01" value="10">
 
-<label>Hàm lượng vàng theo phòng thí nghiệm (g/kg)</label>
+<label>Hàm lượng Au - vàng theo phòng thí nghiệm (g/kg)</label>
 <input id="goldContent" type="number" min="0" step="0.001" value="0">
+<label>Hàm lượng Ag - bạc (g/kg)</label><input id="silverContent" type="number" min="0" step="0.001" value="0">
+<label>Hàm lượng Pd - palladium (g/kg)</label><input id="palladiumContent" type="number" min="0" step="0.001" value="0">
+<label>Hàm lượng Pt - platinum (g/kg)</label><input id="platinumContent" type="number" min="0" step="0.001" value="0">
 
 <label>Tỷ lệ thu hồi thực tế (%)</label>
 <input id="recoveryRate" type="number" min="0" max="100" step="0.1" value="90">
 
-<label>Giá vàng thanh toán (VND/g)</label>
-<input id="goldPrice" type="number" min="0" value="0">
+<label>Giá thanh toán Au - vàng (VND/g)</label><input id="goldPrice" type="number" min="0" value="0">
+<label>Giá thanh toán Ag - bạc (VND/g)</label><input id="silverPrice" type="number" min="0" value="0">
+<label>Giá thanh toán Pd - palladium (VND/g)</label><input id="palladiumPrice" type="number" min="0" value="0">
+<label>Giá thanh toán Pt - platinum (VND/g)</label><input id="platinumPrice" type="number" min="0" value="0">
 
 <label>Giá thu mua phế liệu (VND/kg)</label>
 <input id="goldBuyPrice" type="number" min="0" value="0">
@@ -226,35 +231,15 @@ Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng c
 </div>
 
 <div id="goldResults" class="hidden">
-
-<hr>
-
-<h2>Kết quả thu hồi vàng</h2>
-
-<div class="result">
-
-<div class="metric">
-<small>Vàng dự kiến thu hồi</small>
-<strong id="recoveredGold">0 g</strong>
+<hr><h2>Kết quả thu hồi kim loại quý</h2><div class="result">
+<div class="metric"><small>Au dự kiến thu hồi</small><strong id="recoveredGold">0 g</strong></div>
+<div class="metric"><small>Ag dự kiến thu hồi</small><strong id="recoveredSilver">0 g</strong></div>
+<div class="metric"><small>Pd dự kiến thu hồi</small><strong id="recoveredPalladium">0 g</strong></div>
+<div class="metric"><small>Pt dự kiến thu hồi</small><strong id="recoveredPlatinum">0 g</strong></div>
+<div class="metric"><small>Doanh thu tổng 4 kim loại</small><strong id="goldRevenue">0 ₫</strong></div>
+<div class="metric"><small>Chi phí không gồm mua hàng</small><strong id="nonPurchaseCost">0 ₫</strong></div>
+<div class="metric"><small>Giá mua hòa vốn tối đa</small><strong id="breakEvenBuy">0 ₫/kg</strong></div>
 </div>
-
-<div class="metric">
-<small>Doanh thu vàng</small>
-<strong id="goldRevenue">0 ₫</strong>
-</div>
-
-<div class="metric">
-<small>Chi phí không gồm mua hàng</small>
-<strong id="nonPurchaseCost">0 ₫</strong>
-</div>
-
-<div class="metric">
-<small>Giá mua hòa vốn tối đa</small>
-<strong id="breakEvenBuy">0 ₫/kg</strong>
-</div>
-
-</div>
-
 <p class="note">Giá mua hòa vốn tối đa được tính theo dữ liệu nhập, chưa tính các khoản thuế hoặc chi phí chưa khai báo.</p>
 
 </div>
@@ -442,13 +427,17 @@ if(mode==='C'){
 
 weight=num('goldWeight');
 
-const content=num('goldContent');
 const recovery=Math.min(100,num('recoveryRate'))/100;
-const goldPrice=num('goldPrice');
-
-const estimatedGold=weight*content*recovery;
-
-revenue=estimatedGold*goldPrice;
+const metals=[
+{key:'Au',content:num('goldContent'),price:num('goldPrice')},
+{key:'Ag',content:num('silverContent'),price:num('silverPrice')},
+{key:'Pd',content:num('palladiumContent'),price:num('palladiumPrice')},
+{key:'Pt',content:num('platinumContent'),price:num('platinumPrice')}
+];
+const recovered={};
+revenue=0;
+metals.forEach(m=>{recovered[m.key]=weight*m.content*recovery;revenue+=recovered[m.key]*m.price;});
+const estimatedGold=recovered.Au;
 
 const purchaseCost=weight*num('goldBuyPrice');
 
@@ -466,18 +455,17 @@ const breakEven=weight>0?
 
 extra={
 goldMaterial:val('goldMaterial'),
-goldContent:content,
+goldContent:num('goldContent'),silverContent:num('silverContent'),palladiumContent:num('palladiumContent'),platinumContent:num('platinumContent'),
 recoveryRate:recovery*100,
-goldPrice:goldPrice,
-recoveredGold:estimatedGold,
-purchaseCost:purchaseCost,
-processingCost:processingCost,
-breakEvenBuy:breakEven
+goldPrice:num('goldPrice'),silverPrice:num('silverPrice'),palladiumPrice:num('palladiumPrice'),platinumPrice:num('platinumPrice'),
+recoveredGold:recovered.Au,recoveredSilver:recovered.Ag,recoveredPalladium:recovered.Pd,recoveredPlatinum:recovered.Pt,
+purchaseCost:purchaseCost,processingCost:processingCost,breakEvenBuy:breakEven
 };
 
-document.getElementById('recoveredGold').textContent=
-estimatedGold.toFixed(3)+' g';
-
+document.getElementById('recoveredGold').textContent=recovered.Au.toFixed(3)+' g';
+document.getElementById('recoveredSilver').textContent=recovered.Ag.toFixed(3)+' g';
+document.getElementById('recoveredPalladium').textContent=recovered.Pd.toFixed(3)+' g';
+document.getElementById('recoveredPlatinum').textContent=recovered.Pt.toFixed(3)+' g';
 document.getElementById('goldRevenue').textContent=money(revenue);
 document.getElementById('nonPurchaseCost').textContent=money(processingCost);
 document.getElementById('breakEvenBuy').textContent=money(breakEven)+'/kg';
@@ -516,8 +504,8 @@ profit<0?
 'CẢNH BÁO: Giao dịch đang lỗ.':
 'Giao dịch hòa vốn hoặc chưa có dữ liệu.';
 
-if(mode==='C'&&(num('goldContent')===0||num('goldPrice')===0)){
-status='Chưa đủ dữ liệu vàng. Hãy nhập hàm lượng kiểm nghiệm và giá vàng thanh toán.';
+if(mode==='C'&&(['goldContent','silverContent','palladiumContent','platinumContent'].every(id=>num(id)===0)||['goldPrice','silverPrice','palladiumPrice','platinumPrice'].every(id=>num(id)===0))){
+status='Chưa đủ dữ liệu. Hãy nhập kết quả phòng thí nghiệm và giá thanh toán cho ít nhất một kim loại.';
 }
 
 document.getElementById('status').textContent=status;
@@ -562,7 +550,7 @@ box.innerHTML=records.map(r=>`
 <b>${escapeHTML(r.material)} - ${r.mode==='A'?'Môi giới':r.mode==='B'?'Thu mua bán lại':'Thu hồi vàng điện tử'}</b><br>
 ${escapeHTML(r.date||'')}<br>
 Khối lượng: ${Number(r.weight||0).toLocaleString('vi-VN')} kg<br>
-${r.mode==='C'?'Vàng dự kiến: '+Number(r.recoveredGold||0).toFixed(3)+' g<br>':''}
+${r.mode==='C'?'Au/Ag/Pd/Pt dự kiến (g): '+[r.recoveredGold,r.recoveredSilver,r.recoveredPalladium,r.recoveredPlatinum].map(x=>Number(x||0).toFixed(3)).join(' / ')+'<br>':''}
 Lợi nhuận:
 <b class="${r.profit>=0?'profit':'loss'}">${money(Number(r.profit)||0)}</b>
 </div>
@@ -581,8 +569,9 @@ return;
 
 const headers=[
 'Date','Material','Mode','Weight kg',
-'Gold content g/kg','Recovery rate %',
-'Recovered gold g','Gold price VND/g',
+'Au g/kg','Ag g/kg','Pd g/kg','Pt g/kg','Recovery rate %',
+'Recovered Au g','Recovered Ag g','Recovered Pd g','Recovered Pt g',
+'Au price VND/g','Ag price VND/g','Pd price VND/g','Pt price VND/g',
 'Revenue VND','Cost VND','Profit VND','Margin %',
 'Break-even buy price VND/kg'
 ];
@@ -594,10 +583,10 @@ r.date||'',
 r.material||'',
 r.mode||'',
 r.weight||0,
-r.goldContent||'',
+r.goldContent||'',r.silverContent||'',r.palladiumContent||'',r.platinumContent||'',
 r.recoveryRate||'',
-r.recoveredGold||'',
-r.goldPrice||'',
+r.recoveredGold||'',r.recoveredSilver||'',r.recoveredPalladium||'',r.recoveredPlatinum||'',
+r.goldPrice||'',r.silverPrice||'',r.palladiumPrice||'',r.platinumPrice||'',
 r.revenue||0,
 r.cost||0,
 r.profit||0,

@@ -1,25 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#123f32">
-<meta name="description" content="AI SCRAP Vietnam - National Scrap Material Price Board">
-<title>AI SCRAP - National Price Board</title>
-
+<meta name="description" content="AI SCRAP Vietnam - Bảng giá phế liệu toàn quốc">
+<title>AI SCRAP - Bảng giá toàn quốc</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f2f6f3;color:#18332b;font-family:Arial,sans-serif}
+body{margin:0;padding-bottom:90px;background:#f2f6f3;color:#18332b;font-family:Arial,sans-serif}
 header{background:#123f32;color:white;padding:20px 15px}
 header h1{font-size:21px;margin:0 0 7px}
 header p{font-size:13px;color:#d5e8df;margin:0}
-
-/* 页面导航 */
-.site-nav{display:flex;flex-wrap:wrap;gap:8px;padding:12px 15px;background:#e5eee9}
-.site-nav a{flex:1;min-width:130px;padding:11px 8px;background:white;color:#123f32;border:1px solid #cbd9d1;border-radius:8px;text-align:center;text-decoration:none;font-size:13px;font-weight:bold}
-.site-nav a:hover{background:#d5e8df}
-
 main{max-width:1100px;margin:auto;padding:14px}
 .panel{background:white;border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:0 2px 8px #0000000c}
 h2{font-size:18px;margin:5px 0 14px}
@@ -27,17 +20,15 @@ h2{font-size:18px;margin:5px 0 14px}
 button,.btn{border:0;border-radius:8px;padding:12px;background:#16734f;color:white;font-size:14px;cursor:pointer;text-decoration:none;text-align:center}
 .tabs button{background:#e2ebe5;color:#18332b}
 .tabs button.active{background:#16734f;color:white}
-input,select{width:100%;padding:11px;border:1px solid #ccd8d2;border-radius:8px;font-size:14px;background:white}
+input,select{width:100%;padding:11px;border:1px solid #ccd8d2;border-radius:8px;font-size:16px;background:white}
 label{font-size:13px;font-weight:bold;display:block;margin:10px 0 5px}
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
 .table-wrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%;min-width:1050px;font-size:13px}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:13px}
 th,td{padding:11px 9px;border-bottom:1px solid #e5ebe6;text-align:left;white-space:nowrap}
 th{background:#edf3ef}
-td strong{color:#16734f}
 .up{color:#16834f}
 .down{color:#bd3434}
-.neutral{color:#718078}
 .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .formgrid .full{grid-column:1/-1}
 .action{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
@@ -45,15 +36,23 @@ td strong{color:#16734f}
 .small{font-size:12px;color:#718078;line-height:1.6}
 .hidden{display:none}
 .badge{padding:4px 7px;border-radius:5px;background:#edf3ef;font-size:11px}
-.verified{background:#e2f4e8;color:#16734f}
 .unverified{background:#fff1dc;color:#96620a}
 .notice{padding:11px;background:#fff8e9;border-left:4px solid #d69a32;border-radius:6px;font-size:12px;line-height:1.6;color:#76551b}
+.cbtn{display:inline-block;padding:7px 10px;border-radius:6px;background:#16734f;color:#fff;text-decoration:none;font-weight:bold;font-size:12px;margin-right:4px}
+.cbtn.zalo{background:#0068ff}
+.mini{padding:7px 10px;font-size:12px;background:#c62828}
+#message{margin-top:12px;padding:12px;border-radius:8px;overflow-wrap:anywhere}
+#message:empty{display:none}
 footer{text-align:center;padding:20px;color:#718078;font-size:12px}
+
+/* Điều hướng dưới cùng */
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#fff;border-top:1px solid #cbd9d1;z-index:99;padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav a{flex:1;padding:8px 2px;text-align:center;text-decoration:none;color:#718078;font-size:11px}
+.bottom-nav a span{display:block;font-size:20px}
+.bottom-nav a.active{color:#16734f;font-weight:bold}
 
 @media(max-width:480px){
  .formgrid,.filters{grid-template-columns:1fr}
- .tabs{grid-template-columns:1fr 1fr}
- .site-nav a{min-width:100%}
 }
 </style>
 </head>
@@ -61,15 +60,9 @@ footer{text-align:center;padding:20px;color:#718078;font-size:12px}
 <body>
 
 <header>
-<h1>AI SCRAP - NATIONAL PRICE BOARD</h1>
+<h1>AI SCRAP - BẢNG GIÁ TOÀN QUỐC</h1>
 <p>BẢNG GIÁ PHẾ LIỆU TOÀN QUỐC - VIỆT NAM</p>
 </header>
-
-<nav class="site-nav">
-<a href="index.html">🏠 Trang chủ</a>
-<a href="quote-board.html">📊 Bảng giá toàn quốc</a>
-<a href="profit-calculator.html">🔒 Công cụ lợi nhuận</a>
-</nav>
 
 <main>
 
@@ -83,23 +76,14 @@ footer{text-align:center;padding:20px;color:#718078;font-size:12px}
 </div>
 </div>
 
-<!-- 参考价格 -->
+<!-- Giá tham khảo -->
 <section id="market" class="panel">
 <h2>Giá phế liệu tham khảo toàn quốc</h2>
-
-<p class="small">
-Đơn vị: VND/kg. Giá khởi tạo là dữ liệu tham khảo ban đầu,
-không phải giá giao dịch đã xác minh trong ngày.
-</p>
-
-<div class="notice">
-Lưu ý: Giá hôm qua, biến động giá và tình trạng xác minh chỉ được hiển thị khi có dữ liệu thực tế.
-Không tự động coi giá tham khảo cũ là giá hôm nay.
-</div>
+<p class="small">Đơn vị: VND/kg. Đây là dữ liệu tham khảo ban đầu, không phải giá giao dịch đã xác minh trong ngày.</p>
 
 <div class="filters" style="margin-top:12px">
-<input id="marketSearch" placeholder="Tìm loại phế liệu..." oninput="renderAll()">
-<select id="marketSort" onchange="renderAll()">
+<input id="marketSearch" placeholder="Tìm loại phế liệu..." oninput="renderMarket()">
+<select id="marketSort" onchange="renderMarket()">
 <option value="name">Sắp xếp tên</option>
 <option value="low">Giá thấp đến cao</option>
 <option value="high">Giá cao đến thấp</option>
@@ -111,14 +95,10 @@ Không tự động coi giá tham khảo cũ là giá hôm nay.
 <thead>
 <tr>
 <th>Vật liệu</th>
-<th>Giá hôm nay thấp</th>
-<th>Giá hôm nay cao</th>
-<th>Giá hôm qua</th>
-<th>Biến động</th>
-<th>Khu vực</th>
+<th>Giá thấp</th>
+<th>Giá cao</th>
 <th>Nguồn dữ liệu</th>
-<th>Thời gian cập nhật</th>
-<th>Xác minh điện thoại</th>
+<th>Xác minh</th>
 </tr>
 </thead>
 <tbody id="marketRows"></tbody>
@@ -126,114 +106,79 @@ Không tự động coi giá tham khảo cũ là giá hôm nay.
 </div>
 </section>
 
-<!-- 买家报价 -->
+<!-- Người mua -->
 <section id="buyers" class="panel hidden">
 <h2>Bảng báo giá người mua</h2>
-
 <div class="filters">
-<input id="buyerSearch" placeholder="Tìm vật liệu hoặc người mua..." oninput="renderAll()">
-<select id="buyerRegion" onchange="renderAll()">
+<input id="buyerSearch" placeholder="Tìm vật liệu hoặc người mua..." oninput="renderQuotes('buyer')">
+<select id="buyerRegion" onchange="renderQuotes('buyer')">
 <option value="">Tất cả khu vực</option>
-<option>Hồ Chí Minh</option>
-<option>Bình Dương</option>
-<option>Đồng Nai</option>
-<option>Long An</option>
-<option>Hà Nội</option>
-<option>Đà Nẵng</option>
-<option>Khác</option>
+<option>Hồ Chí Minh</option><option>Bình Dương</option><option>Đồng Nai</option>
+<option>Long An</option><option>Hà Nội</option><option>Đà Nẵng</option><option>Khác</option>
 </select>
 </div>
-
 <div class="table-wrap">
 <table>
 <thead>
-<tr>
-<th>Người mua</th>
-<th>Khu vực</th>
-<th>Vật liệu</th>
-<th>Giá mua/kg</th>
-<th>Số lượng kg</th>
-<th>Cập nhật</th>
-</tr>
+<tr><th>Người mua</th><th>Khu vực</th><th>Vật liệu</th><th>Giá mua/kg</th><th>Số lượng kg</th><th>Ngày</th><th>Liên hệ</th></tr>
 </thead>
 <tbody id="buyerRows"></tbody>
 </table>
 </div>
 </section>
 
-<!-- 卖家报价 -->
+<!-- Người bán -->
 <section id="sellers" class="panel hidden">
 <h2>Bảng báo giá người bán</h2>
-
 <div class="filters">
-<input id="sellerSearch" placeholder="Tìm vật liệu hoặc người bán..." oninput="renderAll()">
-<select id="sellerRegion" onchange="renderAll()">
+<input id="sellerSearch" placeholder="Tìm vật liệu hoặc người bán..." oninput="renderQuotes('seller')">
+<select id="sellerRegion" onchange="renderQuotes('seller')">
 <option value="">Tất cả khu vực</option>
-<option>Hồ Chí Minh</option>
-<option>Bình Dương</option>
-<option>Đồng Nai</option>
-<option>Long An</option>
-<option>Hà Nội</option>
-<option>Đà Nẵng</option>
-<option>Khác</option>
+<option>Hồ Chí Minh</option><option>Bình Dương</option><option>Đồng Nai</option>
+<option>Long An</option><option>Hà Nội</option><option>Đà Nẵng</option><option>Khác</option>
 </select>
 </div>
-
 <div class="table-wrap">
 <table>
 <thead>
-<tr>
-<th>Người bán</th>
-<th>Khu vực</th>
-<th>Vật liệu</th>
-<th>Giá bán/kg</th>
-<th>Số lượng kg</th>
-<th>Cập nhật</th>
-</tr>
+<tr><th>Người bán</th><th>Khu vực</th><th>Vật liệu</th><th>Giá bán/kg</th><th>Số lượng kg</th><th>Ngày</th><th>Liên hệ</th></tr>
 </thead>
 <tbody id="sellerRows"></tbody>
 </table>
 </div>
 </section>
 
-<!-- 买卖差价 -->
+<!-- Chênh lệch -->
 <section id="spread" class="panel hidden">
 <h2>Bảng so sánh chênh lệch mua bán</h2>
-
-<p class="small">
-Chênh lệch = giá mua cao nhất - giá bán thấp nhất.
-Chưa trừ vận chuyển, hao hụt, kiểm định và chi phí khác.
-</p>
-
+<p class="small">Chênh lệch = giá mua cao nhất - giá bán thấp nhất. Chưa trừ vận chuyển, hao hụt, kiểm định và chi phí khác.</p>
 <div class="table-wrap">
 <table>
 <thead>
-<tr>
-<th>Vật liệu</th>
-<th>Giá bán thấp nhất</th>
-<th>Giá mua cao nhất</th>
-<th>Chênh lệch/kg</th>
-<th>Trạng thái</th>
-</tr>
+<tr><th>Vật liệu</th><th>Giá bán thấp nhất</th><th>Giá mua cao nhất</th><th>Chênh lệch/kg</th><th>Trạng thái</th></tr>
 </thead>
 <tbody id="spreadRows"></tbody>
 </table>
 </div>
 </section>
 
-<!-- 新增报价 -->
+<!-- Thêm báo giá -->
 <section class="panel">
 <h2>Thêm báo giá mới</h2>
+<p class="small">Báo giá sẽ hiển thị công khai cho mọi người cùng với số điện thoại của bạn.</p>
 
-<p class="small">
-Nhập báo giá người mua hoặc người bán.
-Thông tin được lưu trong trình duyệt thiết bị này.
-</p>
+<div id="loginNotice" class="notice hidden" style="margin-top:10px">
+Bạn cần đăng nhập để thêm báo giá.
+<a href="login.html?redirect=quote-board.html" style="color:#76551b;font-weight:bold">Đăng nhập</a>
+hoặc
+<a href="register.html" style="color:#76551b;font-weight:bold">Đăng ký</a>
+</div>
 
+<div id="quoteForm" class="hidden">
 <div class="formgrid">
 
 <div>
-<label>Loại báo giá</label>
+<label for="quoteType">Loại báo giá</label>
 <select id="quoteType">
 <option value="buyer">Người mua - thu mua</option>
 <option value="seller">Người bán - chào bán</option>
@@ -241,73 +186,57 @@ Thông tin được lưu trong trình duyệt thiết bị này.
 </div>
 
 <div>
-<label>Tên người mua / người bán</label>
+<label for="quoteName">Tên người mua / người bán</label>
 <input id="quoteName" placeholder="Tên thương nhân">
 </div>
 
 <div>
-<label>Khu vực</label>
+<label for="quoteRegion">Khu vực</label>
 <select id="quoteRegion">
-<option>Hồ Chí Minh</option>
-<option>Bình Dương</option>
-<option>Đồng Nai</option>
-<option>Long An</option>
-<option>Hà Nội</option>
-<option>Đà Nẵng</option>
-<option>Khác</option>
+<option>Hồ Chí Minh</option><option>Bình Dương</option><option>Đồng Nai</option>
+<option>Long An</option><option>Hà Nội</option><option>Đà Nẵng</option><option>Khác</option>
 </select>
 </div>
 
 <div>
-<label>Vật liệu</label>
+<label for="quoteMaterial">Vật liệu</label>
 <input id="quoteMaterial" placeholder="Ví dụ: Đồng đỏ">
 </div>
 
 <div>
-<label>Giá VND/kg</label>
+<label for="quotePrice">Giá VND/kg</label>
 <input id="quotePrice" type="number" min="1" placeholder="Giá báo">
 </div>
 
 <div>
-<label>Số lượng kg</label>
+<label for="quoteQty">Số lượng kg</label>
 <input id="quoteQty" type="number" min="0" placeholder="Khối lượng">
 </div>
 
 <div class="full">
-<label>Nguồn / ghi chú / điều kiện hàng</label>
-<input id="quoteNote" placeholder="Ví dụ: Hàng sạch, đã kiểm tra, báo giá qua điện thoại">
+<label for="quotePhone">Số điện thoại / Zalo *</label>
+<input id="quotePhone" type="tel" inputmode="tel" placeholder="0912345678">
+</div>
+
+<div class="full">
+<label for="quoteNote">Ghi chú / điều kiện hàng</label>
+<input id="quoteNote" placeholder="Ví dụ: Hàng sạch, đã kiểm tra">
 </div>
 
 </div>
 
 <div class="action">
-<button onclick="addQuote()">LƯU BÁO GIÁ</button>
-<button onclick="exportCSV()">XUẤT CSV</button>
+<button id="saveBtn" onclick="addQuote()">LƯU BÁO GIÁ</button>
+<button style="background:#245c85" onclick="exportCSV()">XUẤT CSV</button>
+</div>
 </div>
 
-<p class="small">
-Chỉ nhập thông tin liên hệ khi đã được phép công khai.
-Báo giá chưa xác minh cần ghi rõ nguồn và trạng thái.
-</p>
+<div id="message" role="status"></div>
 </section>
 
-<!-- 数据管理 -->
 <div class="panel">
-<h2>Quản lý dữ liệu</h2>
-
-<button style="background:#245c85;width:100%" onclick="exportCSV()">
-TẢI XUỐNG TOÀN BỘ BÁO GIÁ CSV
-</button>
-
-<p class="small">
-Dữ liệu hiện lưu cục bộ trên trình duyệt.
-Chưa đồng bộ giữa các thiết bị hoặc người dùng.
-</p>
-
 <p class="notice">
-Giá tham khảo ban đầu chưa được xác minh qua điện thoại.
-Chức năng quản trị và đăng nhập bảo mật chưa được triển khai.
-Không nhập mật khẩu hoặc dữ liệu nhạy cảm tại trang này.
+Báo giá do người dùng tự đăng, chưa được xác minh. Hãy kiểm tra hàng và thỏa thuận trực tiếp trước khi giao dịch. Không chuyển tiền trước cho người lạ.
 </p>
 </div>
 
@@ -317,272 +246,135 @@ Không nhập mật khẩu hoặc dữ liệu nhạy cảm tại trang này.
 AI SCRAP & WASTE EXCHANGE PRO · Vietnam
 </footer>
 
+<nav class="bottom-nav" id="bottomNav">
+  <a href="index.html"><span>🏠</span>Trang chủ</a>
+  <a href="market.html"><span>🛒</span>Chợ</a>
+  <a href="sell.html"><span>➕</span>Đăng bán</a>
+  <a href="quote-board.html"><span>📊</span>Bảng giá</a>
+  <a href="profit-calculator.html"><span>🧮</span>Lợi nhuận</a>
+</nav>
+
 <script>
-/* 初始参考价格 */
-const initialMarket = [
-{
- name:'Đồng đỏ',
- low:360000,
- high:420000
-},
-{
- name:'Đồng thau',
- low:250000,
- high:280000
-},
-{
- name:'Inox 304',
- low:39000,
- high:53000
-},
-{
- name:'Inox 316',
- low:60000,
- high:66000
-},
-{
- name:'Phế liệu Niken',
- low:410000,
- high:700000
-},
-{
- name:'Phế liệu bạc',
- low:9000000,
- high:19800000
-},
-{
- name:'Bo mạch điện tử',
- low:19000,
- high:11500000
-},
-{
- name:'Hợp kim cứng Wolfram-Cobalt',
- low:2200000,
- high:6000000
-},
-{
- name:'Nhôm',
- low:null,
- high:null
-}
+const db = window.supabase.createClient(
+  "https://uddrsqankxnepjzgdatx.supabase.co",
+  "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A"
+);
+
+/* Giá tham khảo ban đầu */
+const market = [
+ {name:'Đồng đỏ', low:360000, high:420000},
+ {name:'Đồng thau', low:250000, high:280000},
+ {name:'Inox 304', low:39000, high:53000},
+ {name:'Inox 316', low:60000, high:66000},
+ {name:'Phế liệu Niken', low:410000, high:700000},
+ {name:'Phế liệu bạc', low:9000000, high:19800000},
+ {name:'Bo mạch điện tử', low:19000, high:11500000},
+ {name:'Hợp kim cứng Wolfram-Cobalt', low:2200000, high:6000000},
+ {name:'Nhôm', low:null, high:null}
 ];
 
-/* 读取旧数据并兼容之前版本 */
-function loadMarket(){
- try{
-  const saved=JSON.parse(localStorage.getItem('scrapMarket')||'null');
+let quotes = [];
+let user = null;
 
-  if(!Array.isArray(saved)) return makeInitialMarket();
-
-  const result=saved.map(item=>{
-   if(Array.isArray(item)){
-    return makeMarketItem({
-     name:item[0],
-     low:item[1],
-     high:item[2]
-    });
-   }
-   return makeMarketItem(item);
-  });
-
-  initialMarket.forEach(base=>{
-   if(!result.some(x=>x.name===base.name)){
-    result.push(makeMarketItem(base));
-   }
-  });
-
-  return result;
-
- }catch(e){
-  return makeInitialMarket();
- }
-}
-
-function makeInitialMarket(){
- return initialMarket.map(item=>makeMarketItem(item));
-}
-
-function makeMarketItem(item){
- return {
-  name:item.name||'',
-  low:item.low===null?null:Number(item.low),
-  high:item.high===null?null:Number(item.high),
-  yesterdayLow:item.yesterdayLow??null,
-  yesterdayHigh:item.yesterdayHigh??null,
-  region:item.region||'Chưa xác định',
-  source:item.source||'Dữ liệu tham khảo ban đầu',
-  updatedAt:item.updatedAt||'Chưa cập nhật',
-  verified: item.verified===true
- };
-}
-
-let market=loadMarket();
-
-let quotes=[];
-try{
- quotes=JSON.parse(localStorage.getItem('scrapQuotes')||'[]');
- if(!Array.isArray(quotes)) quotes=[];
-}catch(e){
- quotes=[];
-}
-
-/* 保存数据 */
-function save(){
- localStorage.setItem('scrapMarket',JSON.stringify(market));
- localStorage.setItem('scrapQuotes',JSON.stringify(quotes));
-}
-
-/* 格式化价格 */
-function money(n){
- if(n===null||n===undefined||n===''||!Number.isFinite(Number(n))){
-  return 'Chưa cập nhật';
- }
- return Number(n).toLocaleString('vi-VN')+' ₫';
-}
-
-/* 防止输入内容破坏HTML */
-function esc(s){
- return String(s??'').replace(/[&<>"']/g,c=>({
-  '&':'&amp;',
-  '<':'&lt;',
-  '>':'&gt;',
-  '"':'&quot;',
-  "'":'&#39;'
+function safe(s){
+ return String(s ?? '').replace(/[&<>"']/g, c => ({
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
  }[c]));
 }
 
-/* 计算昨日和今日的中间价涨跌幅 */
-function getChange(item){
- const hasYesterday=
-  item.yesterdayLow!==null &&
-  item.yesterdayHigh!==null &&
-  Number(item.yesterdayLow)>0 &&
-  Number(item.yesterdayHigh)>0;
-
- const hasToday=
-  item.low!==null &&
-  item.high!==null &&
-  Number(item.low)>=0 &&
-  Number(item.high)>=0;
-
- if(!hasYesterday||!hasToday){
-  return '<span class="neutral">Chưa có dữ liệu</span>';
- }
-
- const yesterdayMid=
-  (Number(item.yesterdayLow)+Number(item.yesterdayHigh))/2;
-
- const todayMid=
-  (Number(item.low)+Number(item.high))/2;
-
- if(yesterdayMid===0){
-  return '<span class="neutral">Chưa có dữ liệu</span>';
- }
-
- const percent=((todayMid-yesterdayMid)/yesterdayMid)*100;
- const cls=percent>0?'up':percent<0?'down':'neutral';
- const sign=percent>0?'+':'';
-
- return `<span class="${cls}"><b>${sign}${percent.toFixed(2)}%</b></span>`;
+function money(n){
+ if (n === null || n === undefined || n === '' || !Number.isFinite(Number(n))) return 'Chưa cập nhật';
+ return Number(n).toLocaleString('vi-VN') + ' ₫';
 }
 
-/* 显示报价页面 */
+function phoneDigits(v){
+ return String(v ?? '').replace(/[^\d+]/g, '');
+}
+
+function normalizePhone(input){
+ let p = String(input).replace(/[\s.\-()]/g, '');
+ if (p.startsWith('+84')) p = '0' + p.slice(3);
+ else if (p.startsWith('84') && p.length === 11) p = '0' + p.slice(2);
+ if (!/^0(3|5|7|8|9)\d{8}$/.test(p)) throw new Error('Số điện thoại không hợp lệ.');
+ return p;
+}
+
+function show(text, ok){
+ const m = document.getElementById('message');
+ m.textContent = text;
+ m.style.background = ok ? '#e2f7e9' : '#ffe8e8';
+}
+
 function renderMarket(){
- const search=(document.getElementById('marketSearch').value||'').toLowerCase();
+ const search = (document.getElementById('marketSearch').value || '').toLowerCase();
+ let list = market.filter(x => x.name.toLowerCase().includes(search));
+ const sort = document.getElementById('marketSort').value;
 
- let list=market.filter(x=>x.name.toLowerCase().includes(search));
+ if (sort === 'low') list.sort((a,b) => (a.low ?? Infinity) - (b.low ?? Infinity));
+ if (sort === 'high') list.sort((a,b) => (b.high ?? -Infinity) - (a.high ?? -Infinity));
+ if (sort === 'name') list.sort((a,b) => a.name.localeCompare(b.name, 'vi'));
 
- const sort=document.getElementById('marketSort').value;
-
- if(sort==='low'){
-  list.sort((a,b)=>(a.low??Infinity)-(b.low??Infinity));
- }
-
- if(sort==='high'){
-  list.sort((a,b)=>(b.high??-Infinity)-(a.high??-Infinity));
- }
-
- if(sort==='name'){
-  list.sort((a,b)=>a.name.localeCompare(b.name,'vi'));
- }
-
- document.getElementById('marketRows').innerHTML=
- list.map(item=>{
-  const yesterday=
-   item.yesterdayLow!==null&&item.yesterdayHigh!==null
-   ?money(item.yesterdayLow)+' - '+money(item.yesterdayHigh)
-   :'Chưa cập nhật';
-
-  const verification=item.verified
-   ?'<span class="badge verified">Đã xác minh</span>'
-   :'<span class="badge unverified">Chưa xác minh</span>';
-
-  return `
+ document.getElementById('marketRows').innerHTML = list.map(item => `
   <tr>
-   <td><b>${esc(item.name)}</b></td>
+   <td><b>${safe(item.name)}</b></td>
    <td>${money(item.low)}</td>
    <td>${money(item.high)}</td>
-   <td>${yesterday}</td>
-   <td>${getChange(item)}</td>
-   <td>${esc(item.region)}</td>
-   <td>${esc(item.source)}</td>
-   <td>${esc(item.updatedAt)}</td>
-   <td>${verification}</td>
-  </tr>`;
- }).join('')||
- '<tr><td colspan="9">Không có dữ liệu</td></tr>';
+   <td>Dữ liệu tham khảo ban đầu</td>
+   <td><span class="badge unverified">Chưa xác minh</span></td>
+  </tr>`).join('') || '<tr><td colspan="5">Không có dữ liệu</td></tr>';
 }
 
-/* 买家和卖家报价 */
 function renderQuotes(type){
- const search=(document.getElementById(type+'Search').value||'').toLowerCase();
- const region=document.getElementById(type+'Region').value;
+ const search = (document.getElementById(type + 'Search').value || '').toLowerCase();
+ const region = document.getElementById(type + 'Region').value;
 
- const list=quotes.filter(q=>
-  q.type===type &&
-  (!region||q.region===region) &&
-  [q.name,q.material,q.region].join(' ').toLowerCase().includes(search)
+ const list = quotes.filter(q =>
+  q.type === type &&
+  (!region || q.region === region) &&
+  [q.name, q.material, q.region].join(' ').toLowerCase().includes(search)
  );
 
- document.getElementById(type+'Rows').innerHTML=
- list.map(q=>`
- <tr>
-  <td>${esc(q.name)}</td>
-  <td>${esc(q.region)}</td>
-  <td>${esc(q.material)}</td>
-  <td><b>${money(q.price)}</b></td>
-  <td>${Number(q.qty).toLocaleString('vi-VN')}</td>
-  <td>${esc(q.date)}</td>
- </tr>
- `).join('')||
- '<tr><td colspan="6">Chưa có báo giá. Hãy thêm báo giá bên dưới.</td></tr>';
+ document.getElementById(type + 'Rows').innerHTML = list.map(q => {
+  const p = phoneDigits(q.phone);
+  const mine = user && q.user_id === user.id;
+  return `
+  <tr>
+   <td>${safe(q.name)}${q.note ? '<br><span class="small">' + safe(q.note) + '</span>' : ''}</td>
+   <td>${safe(q.region)}</td>
+   <td>${safe(q.material)}</td>
+   <td><b>${money(q.price)}</b></td>
+   <td>${Number(q.qty).toLocaleString('vi-VN')}</td>
+   <td>${safe(new Date(q.created_at).toLocaleDateString('vi-VN'))}</td>
+   <td>
+    <a class="cbtn" href="tel:${safe(p)}">📞 Gọi</a>
+    <a class="cbtn zalo" href="https://zalo.me/${safe(p)}" target="_blank" rel="noopener">Zalo</a>
+    ${mine ? `<button class="mini" onclick="removeQuote('${safe(q.id)}',this)">Xóa</button>` : ''}
+   </td>
+  </tr>`;
+ }).join('') || '<tr><td colspan="7">Chưa có báo giá. Hãy thêm báo giá bên dưới.</td></tr>';
 }
 
-/* 买卖差价 */
 function renderSpread(){
- const materials=[...new Set(quotes.map(q=>q.material))];
+ const materials = [...new Set(quotes.map(q => q.material))];
 
- document.getElementById('spreadRows').innerHTML=
- materials.map(mat=>{
-  const buyers=quotes.filter(q=>q.type==='buyer'&&q.material===mat);
-  const sellers=quotes.filter(q=>q.type==='seller'&&q.material===mat);
+ document.getElementById('spreadRows').innerHTML = materials.map(mat => {
+  const buyers = quotes.filter(q => q.type === 'buyer' && q.material === mat);
+  const sellers = quotes.filter(q => q.type === 'seller' && q.material === mat);
+  if (!buyers.length || !sellers.length) return '';
 
-  if(!buyers.length||!sellers.length) return '';
-
-  const buy=Math.max(...buyers.map(q=>q.price));
-  const sell=Math.min(...sellers.map(q=>q.price));
-  const diff=buy-sell;
+  const buy = Math.max(...buyers.map(q => Number(q.price)));
+  const sell = Math.min(...sellers.map(q => Number(q.price)));
+  const diff = buy - sell;
 
   return `
   <tr>
-   <td>${esc(mat)}</td>
+   <td>${safe(mat)}</td>
    <td>${money(sell)}</td>
    <td>${money(buy)}</td>
-   <td class="${diff>=0?'up':'down'}"><b>${money(diff)}</b></td>
-   <td>${diff>0?'Cần kiểm tra chi phí':diff===0?'Hòa vốn':'Không có chênh lệch dương'}</td>
+   <td class="${diff >= 0 ? 'up' : 'down'}"><b>${money(diff)}</b></td>
+   <td>${diff > 0 ? 'Cần kiểm tra chi phí' : diff === 0 ? 'Hòa vốn' : 'Không có chênh lệch dương'}</td>
   </tr>`;
- }).join('')||
- '<tr><td colspan="5">Cần có cùng loại vật liệu ở cả bảng mua và bảng bán mới có thể so sánh.</td></tr>';
+ }).join('') || '<tr><td colspan="5">Cần có cùng loại vật liệu ở cả bảng mua và bảng bán mới có thể so sánh.</td></tr>';
 }
 
 function renderAll(){
@@ -592,86 +384,137 @@ function renderAll(){
  renderSpread();
 }
 
-/* 切换标签 */
-function showTab(id,btn){
- document.querySelectorAll('main section').forEach(section=>{
-  section.classList.add('hidden');
- });
-
+function showTab(id, btn){
+ document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
  document.getElementById(id).classList.remove('hidden');
-
- document.querySelectorAll('.tabs button').forEach(button=>{
-  button.classList.remove('active');
- });
-
+ document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
  btn.classList.add('active');
- renderAll();
+ /* Form thêm báo giá luôn hiển thị */
+ document.getElementById('quoteForm').closest('section').classList.remove('hidden');
 }
 
-/* 添加买家或卖家报价 */
-function addQuote(){
- const type=document.getElementById('quoteType').value;
- const name=document.getElementById('quoteName').value.trim();
- const region=document.getElementById('quoteRegion').value;
- const material=document.getElementById('quoteMaterial').value.trim();
- const price=Number(document.getElementById('quotePrice').value);
- const qty=Number(document.getElementById('quoteQty').value)||0;
- const note=document.getElementById('quoteNote').value.trim();
+async function loadQuotes(){
+ const { data, error } = await db
+  .from('scrap_quotes')
+  .select('id,user_id,type,name,region,material,price,qty,note,phone,created_at')
+  .eq('status', 'active')
+  .order('created_at', { ascending: false })
+  .limit(500);
 
- if(!name||!material||!Number.isFinite(price)||price<=0){
-  alert('Vui lòng nhập tên, vật liệu và giá hợp lệ.');
+ if (error) {
+  show('Lỗi tải báo giá: ' + error.message, false);
   return;
  }
-
- quotes.unshift({
-  type,
-  name,
-  region,
-  material,
-  price,
-  qty,
-  note,
-  date:new Date().toLocaleString('vi-VN')
- });
-
- save();
+ quotes = data || [];
  renderAll();
-
- ['quoteName','quoteMaterial','quotePrice','quoteQty','quoteNote'].forEach(id=>{
-  document.getElementById(id).value='';
- });
-
- alert('Đã lưu báo giá trên thiết bị này.');
 }
 
-/* 导出CSV */
-function exportCSV(){
- const rows=[
-  ['Loại','Tên','Khu vực','Vật liệu','Giá VND/kg','Số lượng kg','Ghi chú','Ngày cập nhật'],
-  ...quotes.map(q=>[
-   q.type,q.name,q.region,q.material,q.price,q.qty,q.note,q.date
-  ])
- ];
+async function addQuote(){
+ const btn = document.getElementById('saveBtn');
+ btn.disabled = true;
 
- const csv='\uFEFF'+rows.map(row=>
-  row.map(value=>'"'+String(value??'').replace(/"/g,'""')+'"').join(',')
+ try {
+  if (!user) throw new Error('Vui lòng đăng nhập.');
+
+  const name = document.getElementById('quoteName').value.trim();
+  const material = document.getElementById('quoteMaterial').value.trim();
+  const price = Number(document.getElementById('quotePrice').value);
+  const qty = Number(document.getElementById('quoteQty').value) || 0;
+
+  if (!name || !material || !Number.isFinite(price) || price <= 0) {
+   throw new Error('Vui lòng nhập tên, vật liệu và giá hợp lệ.');
+  }
+
+  const phone = normalizePhone(document.getElementById('quotePhone').value);
+
+  const { error } = await db.from('scrap_quotes').insert({
+   user_id: user.id,
+   type: document.getElementById('quoteType').value,
+   name: name,
+   region: document.getElementById('quoteRegion').value,
+   material: material,
+   price: price,
+   qty: qty,
+   note: document.getElementById('quoteNote').value.trim(),
+   phone: phone
+  });
+
+  if (error) throw error;
+
+  ['quoteMaterial','quotePrice','quoteQty','quoteNote'].forEach(id => {
+   document.getElementById(id).value = '';
+  });
+  show('Đã đăng báo giá thành công.', true);
+  loadQuotes();
+
+ } catch (e) {
+  show('Lỗi: ' + e.message, false);
+ } finally {
+  btn.disabled = false;
+ }
+}
+
+async function removeQuote(id, btn){
+ if (!confirm('Xóa báo giá này?')) return;
+ btn.disabled = true;
+ const { error } = await db.from('scrap_quotes').delete().eq('id', id).eq('user_id', user.id);
+ if (error) {
+  show('Lỗi: ' + error.message, false);
+  btn.disabled = false;
+  return;
+ }
+ show('Đã xóa báo giá.', true);
+ loadQuotes();
+}
+
+function exportCSV(){
+ if (!quotes.length) {
+  alert('Chưa có dữ liệu để xuất.');
+  return;
+ }
+ const rows = [
+  ['Loại','Tên','Khu vực','Vật liệu','Giá VND/kg','Số lượng kg','Ghi chú','SĐT','Ngày'],
+  ...quotes.map(q => [q.type, q.name, q.region, q.material, q.price, q.qty, q.note, q.phone, new Date(q.created_at).toLocaleString('vi-VN')])
+ ];
+ const csv = '\uFEFF' + rows.map(row =>
+  row.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(',')
  ).join('\n');
 
- const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
- const url=URL.createObjectURL(blob);
- const a=document.createElement('a');
-
- a.href=url;
- a.download='AI-SCRAP-quotes.csv';
+ const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = 'AI-SCRAP-quotes.csv';
  a.click();
-
- setTimeout(()=>URL.revokeObjectURL(url),1000);
+ setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-/* 首次载入 */
-save();
-renderAll();
-</script>
+async function init(){
+ renderAll();
 
+ const res = await db.auth.getUser();
+ user = res.data && res.data.user ? res.data.user : null;
+
+ if (user) {
+  document.getElementById('quoteForm').classList.remove('hidden');
+  const meta = user.user_metadata || {};
+  if (meta.full_name) document.getElementById('quoteName').value = meta.full_name;
+  if (meta.phone) document.getElementById('quotePhone').value = meta.phone;
+ } else {
+  document.getElementById('loginNotice').classList.remove('hidden');
+ }
+
+ loadQuotes();
+}
+
+init();
+
+(function(){
+ var page = location.pathname.split('/').pop() || 'index.html';
+ document.querySelectorAll('#bottomNav a').forEach(function(a){
+  if (a.getAttribute('href') === page) a.classList.add('active');
+ });
+})();
+</script>
 </body>
 </html>

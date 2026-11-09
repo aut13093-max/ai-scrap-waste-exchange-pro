@@ -144,15 +144,6 @@ Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng c
 <label>Nhóm phế liệu điện tử (không tính đồng và nhôm)</label>
 <select id="goldMaterial">
 <option>Phế liệu điện tử hỗn hợp - chưa phân loại</option>
-<div class="warning" style="margin-top:12px">
-Tra cứu theo mã CPU. Cơ sở dữ liệu chỉ hiển thị kết quả kiểm nghiệm đã lưu; không tự suy đoán hàm lượng theo tên model.
-</div>
-<label>Mã / model CPU (ví dụ: Intel Pentium 4, AMD K5)</label>
-<input id="cpuModelQuery" type="text" placeholder="Nhập chính xác model hoặc mã CPU">
-<button type="button" class="secondary" onclick="lookupCpuModel()">TRA CỨU MODEL CPU</button>
-<div id="cpuLookupResult" class="identifier-result">Chưa tra cứu model CPU.</div>
-<button type="button" onclick="saveCpuAssay()">LƯU KẾT QUẢ KIỂM NGHIỆM CHO MODEL NÀY</button>
-
 <option>CPU - Bộ vi xử lý</option>
 <option>RAM - Thanh bộ nhớ</option>
 <option>Bo mạch chủ máy tính để bàn</option>
@@ -168,6 +159,15 @@ Tra cứu theo mã CPU. Cơ sở dữ liệu chỉ hiển thị kết quả ki�
 <option>Thiết bị điện tử tháo rời nhiều loại</option>
 <option>Khác</option>
 </select>
+
+<div class="warning" style="margin-top:12px">
+Tra cứu theo mã CPU. Cơ sở dữ liệu chỉ hiển thị kết quả kiểm nghiệm đã lưu; không tự suy đoán hàm lượng theo tên model.
+</div>
+<label>Mã / model CPU (ví dụ: Intel Pentium 4, AMD K5)</label>
+<input id="cpuModelQuery" type="text" placeholder="Nhập chính xác model hoặc mã CPU">
+<button type="button" class="secondary" onclick="lookupCpuModel()">TRA CỨU MODEL CPU</button>
+<div id="cpuLookupResult" class="identifier-result">Chưa tra cứu model CPU.</div>
+<button type="button" onclick="saveCpuAssay()">HƯỚNG DẪN LƯU KẾT QUẢ KIỂM NGHIỆM</button>
 
 <label>Khối lượng mẫu (kg)</label>
 <input id="goldWeight" type="number" min="0" step="0.01" value="1" oninput="calculatePreciousMetal()">
@@ -330,7 +330,12 @@ Lưu ý: Công cụ chỉ tính lượng kim loại theo hàm lượng g/kg do b
 
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+
+const SUPABASE_URL = 'https://uddrsqankxnepjzgdatx.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 let mode='A';
 let lastResult=null;
@@ -394,58 +399,45 @@ calculate();
 
 }
 
-// CPU assay database: user-entered laboratory results are stored locally on this device.
-function getCpuAssayRecords(){
-  try {
-    const data = JSON.parse(localStorage.getItem('aiScrapCpuAssays') || '[]');
-    return Array.isArray(data) ? data : [];
-  } catch(e) { return []; }
-}
+// CPU assay database: read verified laboratory records from Supabase.
 function normalizeCpuModel(value){
-  return String(value || '').trim().toLowerCase().replace(/\\s+/g,' ');
+  return String(value || '').trim().toLowerCase().replace(/\s+/g,' ');
 }
-function lookupCpuModel(){
+async function lookupCpuModel(){
   const query = document.getElementById('cpuModelQuery').value.trim();
   const box = document.getElementById('cpuLookupResult');
   if(!query){ box.textContent = 'Vui lòng nhập mã hoặc model CPU.'; return; }
-  const key = normalizeCpuModel(query);
-  const matches = getCpuAssayRecords().filter(r => normalizeCpuModel(r.model) === key);
-  if(!matches.length){
-    box.innerHTML = '<b>Chưa có dữ liệu kiểm nghiệm cho model này.</b><br>Không thể xác định số gam vàng chỉ dựa vào tên CPU. Hãy kiểm nghiệm mẫu đại diện, nhập Au/Ag/Pd/Pt bên dưới rồi lưu kết quả cho model.';
+  box.textContent = 'Đang tra cứu cơ sở dữ liệu AI SCRAP...';
+  const { data, error } = await supabaseClient
+    .from('cpu_assay_records')
+    .select('model_name, au_g_per_kg, ag_g_per_kg, pd_g_per_kg, pt_g_per_kg, is_verified')
+    .ilike('model_name', query)
+    .limit(1);
+  if(error){
+    console.error('Supabase CPU lookup error:', error);
+    box.textContent = 'Không thể kết nối cơ sở dữ liệu. Vui lòng thử lại sau.';
     return;
   }
-  const r = matches[matches.length - 1];
-  document.getElementById('goldContent').value = r.au;
-  document.getElementById('silverContent').value = r.ag;
-  document.getElementById('palladiumContent').value = r.pd;
-  document.getElementById('platinumContent').value = r.pt;
+  if(!data || !data.length){
+    box.innerHTML = '<b>Chưa có dữ liệu kiểm nghiệm cho model này.</b><br>Không thể xác định hàm lượng kim loại chỉ dựa vào tên CPU. Cần kiểm nghiệm mẫu đại diện và由管理员录入数据库。';
+    return;
+  }
+  const r = data[0];
+  document.getElementById('goldContent').value = r.au_g_per_kg ?? 0;
+  document.getElementById('silverContent').value = r.ag_g_per_kg ?? 0;
+  document.getElementById('palladiumContent').value = r.pd_g_per_kg ?? 0;
+  document.getElementById('platinumContent').value = r.pt_g_per_kg ?? 0;
   calculatePreciousMetal();
-  box.innerHTML = '<b>Đã tìm thấy kết quả kiểm nghiệm đã lưu.</b><br>Model: ' + escapeHTML(r.model) +
-    '<br>Au: ' + Number(r.au).toFixed(3) + ' g/kg' +
-    '<br>Ag: ' + Number(r.ag).toFixed(3) + ' g/kg' +
-    '<br>Pd: ' + Number(r.pd).toFixed(3) + ' g/kg' +
-    '<br>Pt: ' + Number(r.pt).toFixed(3) + ' g/kg' +
-    '<br><span class="note">Ngày lưu: ' + escapeHTML(r.date || '') + '. Nguồn: dữ liệu kiểm nghiệm do người dùng lưu trên thiết bị này.</span>';
+  box.innerHTML = '<b>已找到云端检测记录。</b><br>Model: ' + escapeHTML(r.model_name) +
+    '<br>Au: ' + Number(r.au_g_per_kg || 0).toFixed(3) + ' g/kg' +
+    '<br>Ag: ' + Number(r.ag_g_per_kg || 0).toFixed(3) + ' g/kg' +
+    '<br>Pd: ' + Number(r.pd_g_per_kg || 0).toFixed(3) + ' g/kg' +
+    '<br>Pt: ' + Number(r.pt_g_per_kg || 0).toFixed(3) + ' g/kg' +
+    '<br><span class="note">检测状态：' + (r.is_verified ? '已验证' : '未验证') + '。数据来自 AI SCRAP 云端数据库。</span>';
 }
 function saveCpuAssay(){
-  const model = document.getElementById('cpuModelQuery').value.trim();
-  if(!model){ alert('Vui lòng nhập model CPU trước.'); return; }
-  const assay = {
-    model,
-    au: num('goldContent'),
-    ag: num('silverContent'),
-    pd: num('palladiumContent'),
-    pt: num('platinumContent'),
-    date: new Date().toLocaleString('vi-VN')
-  };
-  const records = getCpuAssayRecords();
-  records.push(assay);
-  try {
-    localStorage.setItem('aiScrapCpuAssays', JSON.stringify(records));
-    document.getElementById('cpuLookupResult').textContent = 'Đã lưu kết quả kiểm nghiệm cho ' + model + ' trên thiết bị này. Lần sau có thể nhập đúng model để tra cứu.';
-  } catch(e) {
-    alert('Không thể lưu dữ liệu trong trình duyệt.');
-  }
+  document.getElementById('cpuLookupResult').textContent =
+    '当前网站仅开放云端读取。为防止任何访客随意写入检测数据，暂不开放公开保存。请由管理员在 Supabase 的 cpu_assay_records 表中录入实验室检测结果。';
 }
 
 // Dedicated precious-metal calculator, independent of the A/B trading calculator.

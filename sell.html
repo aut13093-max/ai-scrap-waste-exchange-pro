@@ -1,141 +1,35 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#126b46">
 <title>Đăng bán phế liệu | AI SCRAP PRO</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-* {
-  box-sizing: border-box;
-}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;padding:0 0 90px;background:#f3f6f4;font-family:Arial,sans-serif;color:#20352b}
+header{background:#126b46;color:white;padding:20px 16px}
+header h2{margin:0 0 6px;font-size:20px}
+main{width:100%;max-width:600px;margin:16px auto;padding:12px}
+.card{background:white;padding:18px;border-radius:14px;box-shadow:0 2px 12px #0001}
+label{display:block;font-weight:bold;margin:17px 0 7px}
+input,select,textarea{display:block;width:100%;min-height:48px;padding:12px;border:1px solid #ccd8d0;border-radius:8px;background:white;font-size:16px;color:#20352b}
+textarea{min-height:100px;resize:vertical}
+.note{font-size:13px;color:#65766c;line-height:1.5}
+#message{padding:12px;margin-top:15px;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+#message:empty{display:none}
+#submitBtn{display:block;width:100%;min-height:54px;margin-top:20px;padding:14px;border:0;border-radius:10px;background:#138451;color:white;font-size:18px;font-weight:bold;cursor:pointer}
+#submitBtn:disabled{opacity:.55;cursor:not-allowed}
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  padding: 0 0 110px;
-  background: #f3f6f4;
-  font-family: Arial, sans-serif;
-  color: #20352b;
-}
-
-header {
-  background: #126b46;
-  color: white;
-  padding: 20px 16px;
-}
-
-header h2 {
-  margin: 0 0 6px;
-  font-size: 20px;
-}
-
-main {
-  width: 100%;
-  max-width: 600px;
-  margin: 16px auto;
-  padding: 12px;
-}
-
-.card {
-  background: white;
-  padding: 18px;
-  border-radius: 14px;
-  box-shadow: 0 2px 12px #0001;
-}
-
-label {
-  display: block;
-  font-weight: bold;
-  margin: 17px 0 7px;
-}
-
-input, select, textarea {
-  display: block;
-  width: 100%;
-  min-height: 48px;
-  padding: 12px;
-  border: 1px solid #ccd8d0;
-  border-radius: 8px;
-  background: white;
-  font-size: 16px;
-  color: #20352b;
-}
-
-textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-.note {
-  font-size: 13px;
-  color: #65766c;
-  line-height: 1.5;
-}
-
-#message {
-  padding: 12px;
-  margin-top: 15px;
-  border-radius: 8px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-#message:empty {
-  display: none;
-}
-
-/* 底部固定发布按钮 */
-.bottom-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 9999;
-  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  background: white;
-  box-shadow: 0 -3px 14px #0002;
-}
-
-#submitBtn {
-  display: block;
-  width: 100%;
-  max-width: 568px;
-  min-height: 54px;
-  margin: 0 auto;
-  padding: 14px;
-  border: 0;
-  border-radius: 10px;
-  background: #138451;
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#submitBtn:disabled {
-  opacity: .55;
-  cursor: not-allowed;
-}
-
-@media (min-width: 700px) {
-  main {
-    margin-top: 24px;
-  }
-
-  .card {
-    padding: 24px;
-  }
-}
+/* Điều hướng dưới cùng */
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#fff;border-top:1px solid #cbd9d1;z-index:99;padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav a{flex:1;padding:8px 2px;text-align:center;text-decoration:none;color:#718078;font-size:11px}
+.bottom-nav a span{display:block;font-size:20px}
+.bottom-nav a.active{color:#16734f;font-weight:bold}
 </style>
 </head>
-
 <body>
 
 <header>
@@ -145,15 +39,13 @@ textarea {
 
 <main>
   <div class="card">
-
     <h3>Đăng sản phẩm mới</h3>
     <p class="note">Vui lòng điền thông tin phế liệu cần bán.</p>
 
     <form id="sellForm">
 
       <label for="title">Tiêu đề sản phẩm *</label>
-      <input id="title" required
-        placeholder="Ví dụ: Đồng phế liệu loại 1">
+      <input id="title" required placeholder="Ví dụ: Đồng phế liệu loại 1">
 
       <label for="category">Danh mục *</label>
       <select id="category" required>
@@ -171,17 +63,13 @@ textarea {
       </select>
 
       <label for="material">Loại vật liệu</label>
-      <input id="material"
-        placeholder="Ví dụ: Đồng đỏ, nhôm, PET">
+      <input id="material" placeholder="Ví dụ: Đồng đỏ, nhôm, PET">
 
       <label for="description">Mô tả</label>
-      <textarea id="description"
-        placeholder="Tình trạng, chất lượng, cách thu gom..."></textarea>
+      <textarea id="description" placeholder="Tình trạng, chất lượng, cách thu gom..."></textarea>
 
       <label for="quantity">Số lượng *</label>
-      <input id="quantity" type="number"
-        min="0.01" step="any" required
-        placeholder="Ví dụ: 500">
+      <input id="quantity" type="number" min="0.01" step="any" required placeholder="Ví dụ: 500">
 
       <label for="unit">Đơn vị *</label>
       <select id="unit" required>
@@ -194,9 +82,7 @@ textarea {
       </select>
 
       <label for="price">Giá bán (VND)</label>
-      <input id="price" type="number"
-        min="0" step="any"
-        placeholder="Để trống nếu thương lượng">
+      <input id="price" type="number" min="0" step="any" placeholder="Để trống nếu thương lượng">
 
       <label for="province">Tỉnh / Thành phố *</label>
       <select id="province" required>
@@ -214,42 +100,60 @@ textarea {
         <option>Tỉnh / thành phố khác</option>
       </select>
 
-      <p class="note">
-        Ảnh sản phẩm sẽ được bổ sung ở bước tiếp theo.
-      </p>
+      <label for="phone">Số điện thoại / Zalo *</label>
+      <input id="phone" type="tel" inputmode="tel" required placeholder="0912345678">
+      <p class="note">Số điện thoại sẽ hiển thị công khai để người mua liên hệ.</p>
+
+      <p class="note">Ảnh sản phẩm sẽ được bổ sung ở bước tiếp theo.</p>
+
+      <button id="submitBtn" type="submit">ĐĂNG BÁN NGAY</button>
 
       <div id="message" role="status"></div>
-
     </form>
   </div>
 </main>
 
-<!-- 按钮固定在手机屏幕底部 -->
-<div class="bottom-bar">
-  <button id="submitBtn" type="submit" form="sellForm">
-    ĐĂNG BÁN NGAY
-  </button>
-</div>
+<nav class="bottom-nav" id="bottomNav">
+  <a href="index.html"><span>🏠</span>Trang chủ</a>
+  <a href="market.html"><span>🛒</span>Chợ</a>
+  <a href="sell.html"><span>➕</span>Đăng bán</a>
+  <a href="quote-board.html"><span>📊</span>Bảng giá</a>
+  <a href="profit-calculator.html"><span>🧮</span>Lợi nhuận</a>
+</nav>
 
 <script>
-const SUPABASE_URL =
-  "https://uddrsqankxnepjzgdatx.supabase.co";
-
-const SUPABASE_KEY =
-  "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A";
-
-const db = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const SUPABASE_URL = "https://uddrsqankxnepjzgdatx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_MpGMJBtAcKRil4Aa8eQttw_fGyHRn5A";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const form = document.getElementById("sellForm");
 const message = document.getElementById("message");
 const button = document.getElementById("submitBtn");
+const phoneInput = document.getElementById("phone");
 
-form.addEventListener("submit", async function(e) {
+/* Chưa đăng nhập thì chuyển sang trang đăng nhập; đã đăng nhập thì tự điền số điện thoại */
+db.auth.getUser().then(function(res){
+  const user = res.data && res.data.user;
+  if (!user) {
+    location.href = "login.html?redirect=sell.html";
+    return;
+  }
+  const saved = user.user_metadata && user.user_metadata.phone;
+  if (saved && !phoneInput.value) phoneInput.value = saved;
+});
+
+function normalizePhone(input){
+  let p = String(input).replace(/[\s.\-()]/g, "");
+  if (p.startsWith("+84")) p = "0" + p.slice(3);
+  else if (p.startsWith("84") && p.length === 11) p = "0" + p.slice(2);
+  if (!/^0(3|5|7|8|9)\d{8}$/.test(p)) {
+    throw new Error("Số điện thoại không hợp lệ.");
+  }
+  return p;
+}
+
+form.addEventListener("submit", async function(e){
   e.preventDefault();
-
   if (!form.reportValidity()) return;
 
   button.disabled = true;
@@ -258,35 +162,24 @@ form.addEventListener("submit", async function(e) {
   message.style.background = "#eef5f0";
 
   try {
-    const { data: authData, error: authError } =
-      await db.auth.getUser();
-
+    const { data: authData, error: authError } = await db.auth.getUser();
     if (authError || !authData.user) {
-      throw new Error(
-        "Vui lòng đăng nhập trước khi đăng bán."
-      );
+      throw new Error("Vui lòng đăng nhập trước khi đăng bán.");
     }
-
     const user = authData.user;
 
-    const quantityValue =
-      Number(document.getElementById("quantity").value);
+    const quantityValue = Number(document.getElementById("quantity").value);
+    const priceText = document.getElementById("price").value.trim();
+    const priceValue = priceText === "" ? null : Number(priceText);
 
-    const priceText =
-      document.getElementById("price").value.trim();
-
-    const priceValue =
-      priceText === "" ? null : Number(priceText);
-
-    if (!Number.isFinite(quantityValue) ||
-        quantityValue <= 0) {
+    if (!Number.isFinite(quantityValue) || quantityValue <= 0) {
       throw new Error("Số lượng không hợp lệ.");
     }
-
-    if (priceValue !== null &&
-        (!Number.isFinite(priceValue) || priceValue < 0)) {
+    if (priceValue !== null && (!Number.isFinite(priceValue) || priceValue < 0)) {
       throw new Error("Giá bán không hợp lệ.");
     }
+
+    const phone = normalizePhone(phoneInput.value);
 
     const listing = {
       seller_id: user.id,
@@ -298,36 +191,37 @@ form.addEventListener("submit", async function(e) {
       unit: document.getElementById("unit").value,
       price: priceValue,
       province: document.getElementById("province").value,
+      phone: phone,
+      status: "active",
       images: []
     };
 
-    const { error } = await db
-      .from("scrap_listings")
-      .insert(listing);
-
+    const { error } = await db.from("scrap_listings").insert(listing);
     if (error) throw error;
 
-    message.textContent =
-      "Đăng sản phẩm thành công!";
-
+    message.textContent = "Đăng sản phẩm thành công!";
     message.style.background = "#e2f7e9";
     form.reset();
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
+    if (user.user_metadata && user.user_metadata.phone) {
+      phoneInput.value = user.user_metadata.phone;
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
   } catch (error) {
     message.textContent = "Lỗi: " + error.message;
     message.style.background = "#ffe8e8";
-
   } finally {
     button.disabled = false;
     button.textContent = "ĐĂNG BÁN NGAY";
   }
 });
-</script>
 
+(function(){
+  var page = location.pathname.split("/").pop() || "index.html";
+  document.querySelectorAll("#bottomNav a").forEach(function(a){
+    if (a.getAttribute("href") === page) a.classList.add("active");
+  });
+})();
+</script>
 </body>
 </html>

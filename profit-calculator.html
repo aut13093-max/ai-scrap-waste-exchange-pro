@@ -161,20 +161,20 @@ Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng c
 </select>
 
 <label>Khối lượng mẫu (kg)</label>
-<input id="goldWeight" type="number" min="0" step="0.01" value="1">
+<input id="goldWeight" type="number" min="0" step="0.01" value="1" oninput="calculatePreciousMetal()">
 
 <label>Au - vàng (g/kg, theo kết quả kiểm nghiệm)</label>
-<input id="goldContent" type="number" min="0" step="0.001" value="0">
-<label>Ag - bạc (g/kg)</label><input id="silverContent" type="number" min="0" step="0.001" value="0">
-<label>Pd - palladium (g/kg)</label><input id="palladiumContent" type="number" min="0" step="0.001" value="0">
-<label>Pt - platinum (g/kg)</label><input id="platinumContent" type="number" min="0" step="0.001" value="0">
+<input id="goldContent" type="number" min="0" step="0.001" value="0" oninput="calculatePreciousMetal()">
+<label>Ag - bạc (g/kg)</label><input id="silverContent" type="number" min="0" step="0.001" value="0" oninput="calculatePreciousMetal()">
+<label>Pd - palladium (g/kg)</label><input id="palladiumContent" type="number" min="0" step="0.001" value="0" oninput="calculatePreciousMetal()">
+<label>Pt - platinum (g/kg)</label><input id="platinumContent" type="number" min="0" step="0.001" value="0" oninput="calculatePreciousMetal()">
 
 
 
 
 </div>
 
-<button id="calculateButton" onclick="calculate()">TÍNH LỢI NHUẬN</button>
+<button id="calculateButton" onclick="calculatePreciousMetal()">TÍNH LƯỢNG KIM LOẠI</button>
 
 </div>
 
@@ -374,6 +374,27 @@ document.getElementById('modeNote').textContent=notes[m];
 
 calculate();
 
+}
+
+// Dedicated precious-metal calculator, independent of the A/B trading calculator.
+function calculatePreciousMetal(){
+  const getNumber = id => {
+    const el = document.getElementById(id);
+    return el ? Math.max(0, Number(el.value) || 0) : 0;
+  };
+  const sampleKg = getNumber('goldWeight');
+  const values = [
+    ['recoveredGold','goldContent'],
+    ['recoveredSilver','silverContent'],
+    ['recoveredPalladium','palladiumContent'],
+    ['recoveredPlatinum','platinumContent']
+  ];
+  values.forEach(([outputId,inputId]) => {
+    const output = document.getElementById(outputId);
+    if(output) output.textContent = (sampleKg * getNumber(inputId)).toFixed(3) + ' g';
+  });
+  const status = document.getElementById('status');
+  if(status) status.textContent = 'Đã tính: khối lượng mẫu (kg) × hàm lượng kiểm nghiệm (g/kg) = lượng kim loại (g).';
 }
 
 // CALCULATOR
@@ -784,7 +805,7 @@ el.addEventListener('change',calculate);
 
 // Open the page in precious-metal calculation mode by default.
 setMode('C');
-calculate();
+calculatePreciousMetal();
 
 </script>
 

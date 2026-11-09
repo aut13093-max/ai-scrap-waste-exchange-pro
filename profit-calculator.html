@@ -169,6 +169,15 @@ Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng c
 <label>Pd - palladium (g/kg)</label><input id="palladiumContent" type="number" min="0" step="0.001" value="0" oninput="calculatePreciousMetal()">
 <label>Pt - platinum (g/kg)</label><input id="platinumContent" type="number" min="0" step="0.001" value="0" oninput="calculatePreciousMetal()">
 
+<div class="identifier-result" id="metalLiveResults">
+<h3>Kết quả tính trực tiếp</h3>
+<b>Au - vàng:</b> <span id="liveAu">0.000 g</span><br>
+<b>Ag - bạc:</b> <span id="liveAg">0.000 g</span><br>
+<b>Pd - palladium:</b> <span id="livePd">0.000 g</span><br>
+<b>Pt - platinum:</b> <span id="livePt">0.000 g</span>
+<p class="note">Công thức: khối lượng mẫu (kg) × hàm lượng (g/kg) = lượng kim loại (g).</p>
+</div>
+
 
 
 
@@ -389,9 +398,13 @@ function calculatePreciousMetal(){
     ['recoveredPalladium','palladiumContent'],
     ['recoveredPlatinum','platinumContent']
   ];
-  values.forEach(([outputId,inputId]) => {
+  const liveIds = ['liveAu','liveAg','livePd','livePt'];
+  values.forEach(([outputId,inputId], index) => {
+    const resultText = (sampleKg * getNumber(inputId)).toFixed(3) + ' g';
     const output = document.getElementById(outputId);
-    if(output) output.textContent = (sampleKg * getNumber(inputId)).toFixed(3) + ' g';
+    if(output) output.textContent = resultText;
+    const liveOutput = document.getElementById(liveIds[index]);
+    if(liveOutput) liveOutput.textContent = resultText;
   });
   const status = document.getElementById('status');
   if(status) status.textContent = 'Đã tính: khối lượng mẫu (kg) × hàm lượng kiểm nghiệm (g/kg) = lượng kim loại (g).';

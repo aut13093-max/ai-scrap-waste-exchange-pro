@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#123f32">
 <meta name="description" content="AI Scrap & Waste Exchange PRO - Sàn giao dịch phế liệu thông minh toàn Việt Nam">
 <title>AI SCRAP & WASTE EXCHANGE PRO</title>
@@ -15,6 +14,7 @@
 
 body {
   margin: 0;
+  padding-bottom: 90px;
   font-family: Arial, sans-serif;
   background: #f3f6f5;
   color: #18332b;
@@ -36,33 +36,6 @@ header p {
   color: #d5e8df;
   margin: 5px 0;
   font-size: 14px;
-}
-
-/* 三个页面统一导航 */
-.site-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px 18px;
-  background: #e5eee9;
-}
-
-.site-nav a {
-  flex: 1;
-  min-width: 130px;
-  padding: 11px 8px;
-  background: white;
-  color: #123f32;
-  border: 1px solid #cbd9d1;
-  border-radius: 8px;
-  text-align: center;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-.site-nav a:hover {
-  background: #d5e8df;
 }
 
 main {
@@ -92,10 +65,13 @@ h2 {
 }
 
 .card {
+  display: block;
   background: white;
   padding: 19px 12px;
   border-radius: 12px;
   text-align: center;
+  text-decoration: none;
+  color: #18332b;
   box-shadow: 0 2px 8px #0000000c;
 }
 
@@ -111,7 +87,6 @@ h2 {
   text-align: center;
 }
 
-button,
 .button {
   display: block;
   width: 100%;
@@ -131,6 +106,12 @@ button,
   background: #245c85;
 }
 
+.note {
+  color: #718078;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 footer {
   text-align: center;
   padding: 25px;
@@ -138,16 +119,36 @@ footer {
   font-size: 13px;
 }
 
-.note {
-  color: #718078;
-  font-size: 13px;
-  line-height: 1.6;
+/* Điều hướng dưới cùng - dùng chung cho mọi trang */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  background: #fff;
+  border-top: 1px solid #cbd9d1;
+  z-index: 99;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-@media (max-width: 380px) {
-  .site-nav a {
-    min-width: 100%;
-  }
+.bottom-nav a {
+  flex: 1;
+  padding: 8px 2px;
+  text-align: center;
+  text-decoration: none;
+  color: #718078;
+  font-size: 11px;
+}
+
+.bottom-nav a span {
+  display: block;
+  font-size: 20px;
+}
+
+.bottom-nav a.active {
+  color: #16734f;
+  font-weight: bold;
 }
 </style>
 </head>
@@ -159,13 +160,6 @@ footer {
   <p>Sàn giao dịch phế liệu thông minh toàn Việt Nam</p>
   <p>Turn Waste Into Value</p>
 </header>
-
-<!-- 页面统一导航 -->
-<nav class="site-nav">
-  <a href="index.html">🏠 Trang chủ</a>
-  <a href="quote-board.html">📊 Bảng giá toàn quốc</a>
-  <a href="profit-calculator.html">🔒 Công cụ lợi nhuận</a>
-</nav>
 
 <main>
 
@@ -182,49 +176,41 @@ footer {
   <h2>Danh mục phế liệu</h2>
 
   <div class="grid">
-    <div class="card">🔩<b>Kim loại</b></div>
-    <div class="card">♻️<b>Nhựa</b></div>
-    <div class="card">📦<b>Giấy & Carton</b></div>
-    <div class="card">💻<b>Điện tử</b></div>
-    <div class="card">🏗️<b>Vật liệu xây dựng</b></div>
-    <div class="card">🪵<b>Gỗ & Cao su</b></div>
-  </div>
-
-  <h2>Giao dịch thông minh bằng AI</h2>
-
-  <div class="action-card">
-    <p>
-      AI tìm người bán và người mua phù hợp trên toàn Việt Nam.
-    </p>
-
-    <a class="button" href="market.html">
-      AI Tìm người bán
-    </a>
-
-    <a class="button secondary" href="register.html?role=buyer">
-      AI Tìm người mua
-    </a>
+    <a class="card" href="market.html?search=Kim%20lo%E1%BA%A1i">🔩<b>Kim loại</b></a>
+    <a class="card" href="market.html?search=Nh%E1%BB%B1a">♻️<b>Nhựa</b></a>
+    <a class="card" href="market.html?search=Gi%E1%BA%A5y">📦<b>Giấy & Carton</b></a>
+    <a class="card" href="market.html?search=%C4%90i%E1%BB%87n%20t%E1%BB%AD">💻<b>Điện tử</b></a>
+    <a class="card" href="market.html?search=x%C3%A2y%20d%E1%BB%B1ng">🏗️<b>Vật liệu xây dựng</b></a>
+    <a class="card" href="market.html?search=G%E1%BB%97">🪵<b>Gỗ & Cao su</b></a>
   </div>
 
   <h2>Bắt đầu giao dịch</h2>
 
-  <div class="grid">
-    <a class="button" href="register.html?role=seller">
+  <div class="action-card">
+    <a class="button" href="sell.html">
       Đăng bán phế liệu
     </a>
 
     <a class="button secondary" href="market.html">
       Tìm nguồn hàng
     </a>
+
+    <a class="button secondary" href="quote-board.html">
+      Xem bảng giá toàn quốc
+    </a>
   </div>
 
   <h2>Tham gia nền tảng</h2>
 
   <div class="action-card">
-    <p>Đăng ký tài khoản người bán hoặc người mua.</p>
+    <p>Đăng ký bằng số điện thoại để đăng bán và liên hệ người mua.</p>
 
     <a class="button" href="register.html">
       Đăng ký tài khoản
+    </a>
+
+    <a class="button secondary" href="login.html">
+      Đăng nhập
     </a>
 
     <p class="note">
@@ -242,6 +228,14 @@ footer {
   © 2026
 </footer>
 
+<nav class="bottom-nav" id="bottomNav">
+  <a href="index.html"><span>🏠</span>Trang chủ</a>
+  <a href="market.html"><span>🛒</span>Chợ</a>
+  <a href="sell.html"><span>➕</span>Đăng bán</a>
+  <a href="quote-board.html"><span>📊</span>Bảng giá</a>
+  <a href="profit-calculator.html"><span>🧮</span>Lợi nhuận</a>
+</nav>
+
 <script>
 document.getElementById("searchForm").addEventListener("submit", function(e) {
   e.preventDefault();
@@ -254,6 +248,13 @@ document.getElementById("searchForm").addEventListener("submit", function(e) {
     window.location.href = "market.html";
   }
 });
+
+(function(){
+  var page = location.pathname.split("/").pop() || "index.html";
+  document.querySelectorAll("#bottomNav a").forEach(function(a){
+    if (a.getAttribute("href") === page) a.classList.add("active");
+  });
+})();
 </script>
 
 </body>

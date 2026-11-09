@@ -144,6 +144,15 @@ Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng c
 <label>Nhóm phế liệu điện tử (không tính đồng và nhôm)</label>
 <select id="goldMaterial">
 <option>Phế liệu điện tử hỗn hợp - chưa phân loại</option>
+<div class="warning" style="margin-top:12px">
+Tra cứu theo mã CPU. Cơ sở dữ liệu chỉ hiển thị kết quả kiểm nghiệm đã lưu; không tự suy đoán hàm lượng theo tên model.
+</div>
+<label>Mã / model CPU (ví dụ: Intel Pentium 4, AMD K5)</label>
+<input id="cpuModelQuery" type="text" placeholder="Nhập chính xác model hoặc mã CPU">
+<button type="button" class="secondary" onclick="lookupCpuModel()">TRA CỨU MODEL CPU</button>
+<div id="cpuLookupResult" class="identifier-result">Chưa tra cứu model CPU.</div>
+<button type="button" onclick="saveCpuAssay()">LƯU KẾT QUẢ KIỂM NGHIỆM CHO MODEL NÀY</button>
+
 <option>CPU - Bộ vi xử lý</option>
 <option>RAM - Thanh bộ nhớ</option>
 <option>Bo mạch chủ máy tính để bàn</option>
@@ -383,6 +392,60 @@ document.getElementById('modeNote').textContent=notes[m];
 
 calculate();
 
+}
+
+// CPU assay database: user-entered laboratory results are stored locally on this device.
+function getCpuAssayRecords(){
+  try {
+    const data = JSON.parse(localStorage.getItem('aiScrapCpuAssays') || '[]');
+    return Array.isArray(data) ? data : [];
+  } catch(e) { return []; }
+}
+function normalizeCpuModel(value){
+  return String(value || '').trim().toLowerCase().replace(/\\s+/g,' ');
+}
+function lookupCpuModel(){
+  const query = document.getElementById('cpuModelQuery').value.trim();
+  const box = document.getElementById('cpuLookupResult');
+  if(!query){ box.textContent = 'Vui lòng nhập mã hoặc model CPU.'; return; }
+  const key = normalizeCpuModel(query);
+  const matches = getCpuAssayRecords().filter(r => normalizeCpuModel(r.model) === key);
+  if(!matches.length){
+    box.innerHTML = '<b>Chưa có dữ liệu kiểm nghiệm cho model này.</b><br>Không thể xác định số gam vàng chỉ dựa vào tên CPU. Hãy kiểm nghiệm mẫu đại diện, nhập Au/Ag/Pd/Pt bên dưới rồi lưu kết quả cho model.';
+    return;
+  }
+  const r = matches[matches.length - 1];
+  document.getElementById('goldContent').value = r.au;
+  document.getElementById('silverContent').value = r.ag;
+  document.getElementById('palladiumContent').value = r.pd;
+  document.getElementById('platinumContent').value = r.pt;
+  calculatePreciousMetal();
+  box.innerHTML = '<b>Đã tìm thấy kết quả kiểm nghiệm đã lưu.</b><br>Model: ' + escapeHTML(r.model) +
+    '<br>Au: ' + Number(r.au).toFixed(3) + ' g/kg' +
+    '<br>Ag: ' + Number(r.ag).toFixed(3) + ' g/kg' +
+    '<br>Pd: ' + Number(r.pd).toFixed(3) + ' g/kg' +
+    '<br>Pt: ' + Number(r.pt).toFixed(3) + ' g/kg' +
+    '<br><span class="note">Ngày lưu: ' + escapeHTML(r.date || '') + '. Nguồn: dữ liệu kiểm nghiệm do người dùng lưu trên thiết bị này.</span>';
+}
+function saveCpuAssay(){
+  const model = document.getElementById('cpuModelQuery').value.trim();
+  if(!model){ alert('Vui lòng nhập model CPU trước.'); return; }
+  const assay = {
+    model,
+    au: num('goldContent'),
+    ag: num('silverContent'),
+    pd: num('palladiumContent'),
+    pt: num('platinumContent'),
+    date: new Date().toLocaleString('vi-VN')
+  };
+  const records = getCpuAssayRecords();
+  records.push(assay);
+  try {
+    localStorage.setItem('aiScrapCpuAssays', JSON.stringify(records));
+    document.getElementById('cpuLookupResult').textContent = 'Đã lưu kết quả kiểm nghiệm cho ' + model + ' trên thiết bị này. Lần sau có thể nhập đúng model để tra cứu.';
+  } catch(e) {
+    alert('Không thể lưu dữ liệu trong trình duyệt.');
+  }
 }
 
 // Dedicated precious-metal calculator, independent of the A/B trading calculator.

@@ -775,6 +775,15 @@ renderPartRecords();
 
 renderRecords();
 renderPartRecords();
+
+// Recalculate immediately when any calculator input changes.
+document.querySelectorAll('#goldFields input, #goldFields select, #generalFields input, #generalFields select, #brokerFields input, #resaleFields input').forEach(el=>{
+el.addEventListener('input',calculate);
+el.addEventListener('change',calculate);
+});
+
+// Open the page in precious-metal calculation mode by default.
+setMode('C');
 calculate();
 
 </script>

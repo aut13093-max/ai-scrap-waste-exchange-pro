@@ -50,7 +50,7 @@ hr{border:0;border-top:1px solid #e2e9e4;margin:17px 0}
 
 <header>
 <h1>AI SCRAP - PRECIOUS METAL CONTENT</h1>
-<p>Công cụ ước tính hàm lượng kim loại quý trong phế liệu điện tử</p>
+<p>Công cụ tính hàm lượng Au, Ag, Pd, Pt trong mọi nhóm phế liệu điện tử; không tính đồng và nhôm</p>
 </header>
 
 <main>
@@ -141,15 +141,23 @@ hr{border:0;border-top:1px solid #e2e9e4;margin:17px 0}
 Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng của phòng thí nghiệm trên mẫu đại diện. Không dùng ảnh hoặc kết quả XRF bề mặt để khẳng định hàm lượng của toàn bộ lô hàng.
 </div>
 
-<label>Phân loại phế liệu điện tử</label>
+<label>Nhóm phế liệu điện tử (không tính đồng và nhôm)</label>
 <select id="goldMaterial">
+<option>Phế liệu điện tử hỗn hợp - chưa phân loại</option>
 <option>CPU - Bộ vi xử lý</option>
 <option>RAM - Thanh bộ nhớ</option>
-<option>Bo mạch chủ máy tính</option>
-<option>Bo mạch điện thoại</option>
+<option>Bo mạch chủ máy tính để bàn</option>
+<option>Bo mạch laptop</option>
 <option>Bo mạch máy chủ</option>
-<option>Bo mạch viễn thông</option>
-<option>Phế liệu điện tử hỗn hợp</option>
+<option>Bo mạch điện thoại di động</option>
+<option>Bo mạch viễn thông / mạng</option>
+<option>Bo mạch công nghiệp / điều khiển</option>
+<option>Bo mạch TV / âm thanh / thiết bị gia dụng</option>
+<option>IC / chip rời</option>
+<option>Đầu nối / chân tiếp xúc mạ</option>
+<option>Ổ cứng HDD / thiết bị lưu trữ</option>
+<option>Thiết bị điện tử tháo rời nhiều loại</option>
+<option>Khác</option>
 </select>
 
 <label>Khối lượng mẫu (kg)</label>
@@ -218,7 +226,7 @@ Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng c
 <div class="metric"><small>Pt - platinum (g)</small><strong id="recoveredPlatinum">0 g</strong></div>
 
 </div>
-<p class="note">Chỉ nhập hàm lượng g/kg từ kết quả kiểm nghiệm đại diện. Không thể xác định chính xác hàm lượng của mọi loại CPU chỉ dựa vào tên hoặc hình ảnh.</p>
+<p class="note">Áp dụng cho nhiều nhóm phế liệu điện tử. Chỉ tính Au, Ag, Pd và Pt; không tính đồng hoặc nhôm. Nhập hàm lượng g/kg từ kết quả kiểm nghiệm đại diện của đúng nhóm vật liệu. Tên nhóm không tự xác định được hàm lượng.</p>
 
 </div>
 
@@ -297,7 +305,7 @@ Chưa có kết quả nhận diện.
 </div>
 
 <p class="note">
-Lưu ý: Công cụ chỉ tính lượng kim loại theo hàm lượng g/kg do bạn nhập từ kết quả kiểm nghiệm. Không có một tỷ lệ cố định áp dụng cho mọi loại CPU. Cần lấy mẫu đại diện và kiểm nghiệm phòng thí nghiệm; dữ liệu được lưu trên trình duyệt của thiết bị này.
+Lưu ý: Công cụ chỉ tính lượng kim loại theo hàm lượng g/kg do bạn nhập từ kết quả kiểm nghiệm. Không có một tỷ lệ cố định áp dụng cho mọi loại CPU. Cần lấy mẫu đại diện và kiểm nghiệm phòng thí nghiệm cho từng nhóm vật liệu; dữ liệu được lưu trên trình duyệt của thiết bị này.
 </p>
 
 <a class="btn secondary" href="index.html">VỀ TRANG CHỦ</a>

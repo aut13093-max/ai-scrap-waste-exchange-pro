@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#123f32">
-<title>AI SCRAP - Smart Profit Calculator PRO</title>
+<title>AI SCRAP - Precious Metal Content Calculator</title>
 
 <style>
 *{box-sizing:border-box}
@@ -49,8 +49,8 @@ hr{border:0;border-top:1px solid #e2e9e4;margin:17px 0}
 <body>
 
 <header>
-<h1>AI SCRAP - SMART PROFIT CALCULATOR PRO</h1>
-<p>Công cụ giao dịch phế liệu và nhận diện linh kiện điện tử</p>
+<h1>AI SCRAP - PRECIOUS METAL CONTENT</h1>
+<p>Công cụ ước tính hàm lượng kim loại quý trong phế liệu điện tử</p>
 </header>
 
 <main>
@@ -63,7 +63,7 @@ hr{border:0;border-top:1px solid #e2e9e4;margin:17px 0}
 <div class="tabs">
 <button id="tabA" class="active" onclick="setMode('A')">A - Môi giới</button>
 <button id="tabB" onclick="setMode('B')">B - Thu mua</button>
-<button id="tabC" onclick="setMode('C')">C - Thu hồi vàng</button>
+<button id="tabC" onclick="setMode('C')">C - Hàm lượng kim loại</button>
 </div>
 
 <p class="note" id="modeNote">Tính thu nhập từ phí môi giới, không cần ôm hàng.</p>
@@ -152,41 +152,21 @@ Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng c
 <option>Phế liệu điện tử hỗn hợp</option>
 </select>
 
-<label>Khối lượng đầu vào (kg)</label>
-<input id="goldWeight" type="number" min="0" step="0.01" value="10">
+<label>Khối lượng mẫu (kg)</label>
+<input id="goldWeight" type="number" min="0" step="0.01" value="1">
 
-<label>Hàm lượng Au - vàng theo phòng thí nghiệm (g/kg)</label>
+<label>Au - vàng (g/kg, theo kết quả kiểm nghiệm)</label>
 <input id="goldContent" type="number" min="0" step="0.001" value="0">
-<label>Hàm lượng Ag - bạc (g/kg)</label><input id="silverContent" type="number" min="0" step="0.001" value="0">
-<label>Hàm lượng Pd - palladium (g/kg)</label><input id="palladiumContent" type="number" min="0" step="0.001" value="0">
-<label>Hàm lượng Pt - platinum (g/kg)</label><input id="platinumContent" type="number" min="0" step="0.001" value="0">
+<label>Ag - bạc (g/kg)</label><input id="silverContent" type="number" min="0" step="0.001" value="0">
+<label>Pd - palladium (g/kg)</label><input id="palladiumContent" type="number" min="0" step="0.001" value="0">
+<label>Pt - platinum (g/kg)</label><input id="platinumContent" type="number" min="0" step="0.001" value="0">
 
-<label>Tỷ lệ thu hồi thực tế (%)</label>
-<input id="recoveryRate" type="number" min="0" max="100" step="0.1" value="90">
 
-<label>Giá thanh toán Au - vàng (VND/g)</label><input id="goldPrice" type="number" min="0" value="0">
-<label>Giá thanh toán Ag - bạc (VND/g)</label><input id="silverPrice" type="number" min="0" value="0">
-<label>Giá thanh toán Pd - palladium (VND/g)</label><input id="palladiumPrice" type="number" min="0" value="0">
-<label>Giá thanh toán Pt - platinum (VND/g)</label><input id="platinumPrice" type="number" min="0" value="0">
 
-<label>Giá thu mua phế liệu (VND/kg)</label>
-<input id="goldBuyPrice" type="number" min="0" value="0">
-
-<label>Phí tinh luyện (VND/kg)</label>
-<input id="refiningFee" type="number" min="0" value="0">
-
-<label>Phí kiểm định (VND)</label>
-<input id="assayFee" type="number" min="0" value="0">
-
-<label>Vận chuyển (VND)</label>
-<input id="goldTransport" type="number" min="0" value="0">
-
-<label>Chi phí khác (VND)</label>
-<input id="goldOtherCost" type="number" min="0" value="0">
 
 </div>
 
-<button onclick="calculate()">TÍNH LỢI NHUẬN</button>
+<button id="calculateButton" onclick="calculate()">TÍNH LỢI NHUẬN</button>
 
 </div>
 
@@ -194,9 +174,9 @@ Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng c
 
 <div class="panel">
 
-<h2>Kết quả giao dịch</h2>
+<h2 id="resultTitle">Kết quả giao dịch</h2>
 
-<div class="result">
+<div class="result" id="financialResults">
 
 <div class="metric">
 <small>Doanh thu</small>
@@ -231,22 +211,20 @@ Chỉ nhập hàm lượng vàng từ kết quả phân tích định lượng c
 </div>
 
 <div id="goldResults" class="hidden">
-<hr><h2>Kết quả thu hồi kim loại quý</h2><div class="result">
-<div class="metric"><small>Au dự kiến thu hồi</small><strong id="recoveredGold">0 g</strong></div>
-<div class="metric"><small>Ag dự kiến thu hồi</small><strong id="recoveredSilver">0 g</strong></div>
-<div class="metric"><small>Pd dự kiến thu hồi</small><strong id="recoveredPalladium">0 g</strong></div>
-<div class="metric"><small>Pt dự kiến thu hồi</small><strong id="recoveredPlatinum">0 g</strong></div>
-<div class="metric"><small>Doanh thu tổng 4 kim loại</small><strong id="goldRevenue">0 ₫</strong></div>
-<div class="metric"><small>Chi phí không gồm mua hàng</small><strong id="nonPurchaseCost">0 ₫</strong></div>
-<div class="metric"><small>Giá mua hòa vốn tối đa</small><strong id="breakEvenBuy">0 ₫/kg</strong></div>
+<hr><h2>Lượng kim loại quý trong mẫu</h2><p class="note">Kết quả dưới đây là số gam trong khối lượng mẫu đã nhập. Với mẫu 1 kg, kết quả chính là số gam/kg.</p><div class="result">
+<div class="metric"><small>Au - vàng (g)</small><strong id="recoveredGold">0 g</strong></div>
+<div class="metric"><small>Ag - bạc (g)</small><strong id="recoveredSilver">0 g</strong></div>
+<div class="metric"><small>Pd - palladium (g)</small><strong id="recoveredPalladium">0 g</strong></div>
+<div class="metric"><small>Pt - platinum (g)</small><strong id="recoveredPlatinum">0 g</strong></div>
+
 </div>
-<p class="note">Giá mua hòa vốn tối đa được tính theo dữ liệu nhập, chưa tính các khoản thuế hoặc chi phí chưa khai báo.</p>
+<p class="note">Chỉ nhập hàm lượng g/kg từ kết quả kiểm nghiệm đại diện. Không thể xác định chính xác hàm lượng của mọi loại CPU chỉ dựa vào tên hoặc hình ảnh.</p>
 
 </div>
 
 <p id="status" class="note">Nhập thông tin để tính toán.</p>
 
-<button onclick="saveRecord()">LƯU GIAO DỊCH</button>
+<button id="saveButton" onclick="saveRecord()">LƯU GIAO DỊCH</button>
 <button class="secondary" onclick="exportCSV()">XUẤT FILE CSV</button>
 
 </div>
@@ -319,7 +297,7 @@ Chưa có kết quả nhận diện.
 </div>
 
 <p class="note">
-Lưu ý: Kết quả tính toán là ước tính dựa trên dữ liệu bạn nhập. Giá vàng, hàm lượng vàng và tỷ lệ thu hồi phải được xác nhận bằng kết quả kiểm nghiệm và điều kiện thanh toán thực tế. Chưa tính doanh thu bạc hoặc palladium. Dữ liệu được lưu trên trình duyệt của thiết bị này.
+Lưu ý: Công cụ chỉ tính lượng kim loại theo hàm lượng g/kg do bạn nhập từ kết quả kiểm nghiệm. Không có một tỷ lệ cố định áp dụng cho mọi loại CPU. Cần lấy mẫu đại diện và kiểm nghiệm phòng thí nghiệm; dữ liệu được lưu trên trình duyệt của thiết bị này.
 </p>
 
 <a class="btn secondary" href="index.html">VỀ TRANG CHỦ</a>
@@ -373,11 +351,15 @@ document.getElementById('resaleFields').classList.toggle('hidden',m!=='B');
 document.getElementById('goldFields').classList.toggle('hidden',m!=='C');
 document.getElementById('goldResults').classList.toggle('hidden',m!=='C');
 document.getElementById('generalFields').classList.toggle('hidden',m==='C');
+document.getElementById('financialResults').classList.toggle('hidden',m==='C');
+document.getElementById('resultTitle').textContent=m==='C'?'Kết quả hàm lượng kim loại quý':'Kết quả giao dịch';
+document.getElementById('calculateButton').textContent=m==='C'?'TÍNH LƯỢNG KIM LOẠI':'TÍNH LỢI NHUẬN';
+document.getElementById('saveButton').textContent=m==='C'?'LƯU KẾT QUẢ KIỂM NGHIỆM':'LƯU GIAO DỊCH';
 
 const notes={
 A:'Tính thu nhập từ phí môi giới, không cần ôm hàng.',
 B:'Tính lợi nhuận thu mua và bán lại sau khi trừ chi phí, hao hụt.',
-C:'Tính lợi nhuận thu hồi vàng từ phế liệu điện tử theo kết quả kiểm nghiệm.'
+C:'Chỉ tính số gam Au, Ag, Pd và Pt trong mẫu phế liệu theo kết quả kiểm nghiệm; không tính tiền.'
 };
 
 document.getElementById('modeNote').textContent=notes[m];
@@ -427,48 +409,29 @@ if(mode==='C'){
 
 weight=num('goldWeight');
 
-const recovery=Math.min(100,num('recoveryRate'))/100;
 const metals=[
-{key:'Au',content:num('goldContent'),price:num('goldPrice')},
-{key:'Ag',content:num('silverContent'),price:num('silverPrice')},
-{key:'Pd',content:num('palladiumContent'),price:num('palladiumPrice')},
-{key:'Pt',content:num('platinumContent'),price:num('platinumPrice')}
+{key:'Au',content:num('goldContent')},
+{key:'Ag',content:num('silverContent')},
+{key:'Pd',content:num('palladiumContent')},
+{key:'Pt',content:num('platinumContent')}
 ];
 const recovered={};
+metals.forEach(m=>{recovered[m.key]=weight*m.content;});
 revenue=0;
-metals.forEach(m=>{recovered[m.key]=weight*m.content*recovery;revenue+=recovered[m.key]*m.price;});
-const estimatedGold=recovered.Au;
-
-const purchaseCost=weight*num('goldBuyPrice');
-
-const processingCost=
-weight*num('refiningFee')+
-num('assayFee')+
-num('goldTransport')+
-num('goldOtherCost');
-
-cost=purchaseCost+processingCost;
-profit=revenue-cost;
-
-const breakEven=weight>0?
-(revenue-processingCost)/weight:0;
+cost=0;
+profit=0;
 
 extra={
 goldMaterial:val('goldMaterial'),
 goldContent:num('goldContent'),silverContent:num('silverContent'),palladiumContent:num('palladiumContent'),platinumContent:num('platinumContent'),
-recoveryRate:recovery*100,
-goldPrice:num('goldPrice'),silverPrice:num('silverPrice'),palladiumPrice:num('palladiumPrice'),platinumPrice:num('platinumPrice'),
-recoveredGold:recovered.Au,recoveredSilver:recovered.Ag,recoveredPalladium:recovered.Pd,recoveredPlatinum:recovered.Pt,
-purchaseCost:purchaseCost,processingCost:processingCost,breakEvenBuy:breakEven
+recoveredGold:recovered.Au,recoveredSilver:recovered.Ag,recoveredPalladium:recovered.Pd,recoveredPlatinum:recovered.Pt
 };
 
 document.getElementById('recoveredGold').textContent=recovered.Au.toFixed(3)+' g';
 document.getElementById('recoveredSilver').textContent=recovered.Ag.toFixed(3)+' g';
 document.getElementById('recoveredPalladium').textContent=recovered.Pd.toFixed(3)+' g';
 document.getElementById('recoveredPlatinum').textContent=recovered.Pt.toFixed(3)+' g';
-document.getElementById('goldRevenue').textContent=money(revenue);
-document.getElementById('nonPurchaseCost').textContent=money(processingCost);
-document.getElementById('breakEvenBuy').textContent=money(breakEven)+'/kg';
+
 
 }
 
@@ -504,8 +467,8 @@ profit<0?
 'CẢNH BÁO: Giao dịch đang lỗ.':
 'Giao dịch hòa vốn hoặc chưa có dữ liệu.';
 
-if(mode==='C'&&(['goldContent','silverContent','palladiumContent','platinumContent'].every(id=>num(id)===0)||['goldPrice','silverPrice','palladiumPrice','platinumPrice'].every(id=>num(id)===0))){
-status='Chưa đủ dữ liệu. Hãy nhập kết quả phòng thí nghiệm và giá thanh toán cho ít nhất một kim loại.';
+if(mode==='C'){
+status=['goldContent','silverContent','palladiumContent','platinumContent'].every(id=>num(id)===0)?'Nhập hàm lượng g/kg từ kết quả kiểm nghiệm để tính số gam kim loại trong mẫu.':'Đã tính lượng kim loại theo hàm lượng kiểm nghiệm đã nhập.';
 }
 
 document.getElementById('status').textContent=status;
@@ -551,8 +514,7 @@ box.innerHTML=records.map(r=>`
 ${escapeHTML(r.date||'')}<br>
 Khối lượng: ${Number(r.weight||0).toLocaleString('vi-VN')} kg<br>
 ${r.mode==='C'?'Au/Ag/Pd/Pt dự kiến (g): '+[r.recoveredGold,r.recoveredSilver,r.recoveredPalladium,r.recoveredPlatinum].map(x=>Number(x||0).toFixed(3)).join(' / ')+'<br>':''}
-Lợi nhuận:
-<b class="${r.profit>=0?'profit':'loss'}">${money(Number(r.profit)||0)}</b>
+${r.mode==='C'?'Kết quả Au / Ag / Pd / Pt (g): '+[r.recoveredGold,r.recoveredSilver,r.recoveredPalladium,r.recoveredPlatinum].map(x=>Number(x||0).toFixed(3)).join(' / '):'Lợi nhuận: '+money(Number(r.profit)||0)}
 </div>
 `).join('');
 
